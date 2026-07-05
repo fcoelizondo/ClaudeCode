@@ -44,7 +44,9 @@
       mafiaSelectLede: "You're the first Mafia to choose. Pick someone to eliminate — your fellow Mafia will see your pick and can agree, or propose someone else.",
       mafiaProposalLede: "is the current pick from your fellow Mafia. Tap them again to agree, or tap someone else to propose a different target.",
       noActionEyebrow: "QUIET NIGHT",
-      noActionLede: "You have no power tonight. Tap a name, then hold to pass the device on.",
+      noActionLede: "You have no power tonight. It doesn't matter what you tap — tap the button below, then hold to pass the device on.",
+      noActionAck: "Nothing to decide — tap here",
+      noActionHint: "Tap the button above to continue.",
       confirmAndContinue: "Hold to confirm & continue",
       nightRetryTitle: "The Mafia didn't agree",
       nightRetryLede: "Everyone gets the device again. Watch only your own screen.",
@@ -136,7 +138,9 @@
       mafiaSelectLede: "Eres el primer mafioso en elegir. Elige a alguien para eliminar — tus compañeros de Mafia verán tu elección y podrán estar de acuerdo o proponer a alguien más.",
       mafiaProposalLede: "es la elección actual de tus compañeros de Mafia. Tócalo de nuevo para estar de acuerdo, o toca a alguien más para proponer un objetivo diferente.",
       noActionEyebrow: "NOCHE TRANQUILA",
-      noActionLede: "No tienes poder esta noche. Toca un nombre y luego mantén presionado para pasar el dispositivo.",
+      noActionLede: "No tienes poder esta noche. No importa qué toques — toca el botón de abajo y luego mantén presionado para pasar el dispositivo.",
+      noActionAck: "Nada que decidir — toca aquí",
+      noActionHint: "Toca el botón de arriba para continuar.",
       confirmAndContinue: "Mantén presionado para confirmar y continuar",
       nightRetryTitle: "La Mafia no se puso de acuerdo",
       nightRetryLede: "Todos reciben el dispositivo de nuevo. Miren solo su propia pantalla.",
@@ -890,11 +894,16 @@
     } else {
       body.appendChild(text("div", "eyebrow", t("noActionEyebrow")));
       body.appendChild(text("p", "lede", t("noActionLede")));
-      body.appendChild(targetChoiceList(idx, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+      var ackList = el("div", { class: "choice-list" });
+      ackList.appendChild(el("button", {
+        class: "choice-btn" + (state.turnPick !== null ? " active" : ""),
+        onclick: function () { state.turnPick = true; render(); }
+      }, [document.createTextNode(t("noActionAck"))]));
+      body.appendChild(ackList);
     }
 
     if (state.turnPick === null) {
-      body.appendChild(text("p", "", t("selectHint")));
+      body.appendChild(text("p", "", role === "village" ? t("noActionHint") : t("selectHint")));
     } else {
       body.appendChild(holdControl(t("confirmAndContinue"), function () {
         finalizeNightTurn();

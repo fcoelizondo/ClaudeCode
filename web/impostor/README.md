@@ -3,8 +3,8 @@
 Pass-the-phone social deduction game. Plain HTML/CSS/JS, no build step,
 no dependencies — open `index.html` directly or serve the folder.
 
-Set the number of agents and impostors, pick a case-file category, then
-pass the device around the table. Each agent holds a button to reveal
+Set the number of players and impostors, pick a case-file category, then
+pass the device around the table. Each player holds a button to reveal
 their word (or their impostor status, plus the category), then holds
 another to conceal it before passing the device on. Once everyone has
 seen their role, a discussion timer runs before the full roster —

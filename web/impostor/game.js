@@ -186,11 +186,11 @@
     var body = el("div", { class: "screen" });
     body.appendChild(text("div", "eyebrow", "BRIEFING SETUP"));
     body.appendChild(text("h1", "", "IMPOSTOR"));
-    body.appendChild(text("p", "lede", "One phone, passed hand to hand. Every agent sees their assignment alone, then conceals it before passing on."));
+    body.appendChild(text("p", "lede", "One phone, passed hand to hand. Every player sees their assignment alone, then conceals it before passing on."));
 
     // players stepper
     var playersField = el("div", { class: "field" });
-    playersField.appendChild(text("div", "field-label", "Agents"));
+    playersField.appendChild(text("div", "field-label", "Players"));
     var pOut = el("output", {}, [document.createTextNode(String(state.numPlayers))]);
     var pMinus = el("button", { onclick: function () {
       state.numPlayers = Math.max(3, state.numPlayers - 1);
@@ -233,7 +233,7 @@
     body.appendChild(catField);
 
     body.appendChild(el("div", { class: "preview mono" }, [document.createTextNode(
-      state.numPlayers + " agents · " + state.numImpostors + " impostor" + (state.numImpostors > 1 ? "s" : "") + " · case file: " + (state.categoryKey === "mix" ? "mix" : WORD_BANK[state.categoryKey].label.toLowerCase())
+      state.numPlayers + " players · " + state.numImpostors + " impostor" + (state.numImpostors > 1 ? "s" : "") + " · case file: " + (state.categoryKey === "mix" ? "mix" : WORD_BANK[state.categoryKey].label.toLowerCase())
     )]));
 
     body.appendChild(el("div", { class: "spacer" }));
@@ -243,8 +243,8 @@
 
   function screenHandoff() {
     var body = el("div", { class: "screen center" });
-    body.appendChild(text("div", "eyebrow", "AGENT " + (state.currentIndex + 1) + " OF " + state.numPlayers));
-    body.appendChild(text("h2", "", "Pass the device to Agent " + (state.currentIndex + 1)));
+    body.appendChild(text("div", "eyebrow", "PLAYER " + (state.currentIndex + 1) + " OF " + state.numPlayers));
+    body.appendChild(text("h2", "", "Pass the device to Player " + (state.currentIndex + 1)));
     body.appendChild(text("p", "", "Everyone else, look away. Hold the button below to view your assignment."));
 
     var wrap = el("div", { class: "hold-wrap" });
@@ -309,7 +309,7 @@
     var body = el("div", { class: "screen center" });
     body.appendChild(text("div", "eyebrow", "BRIEFING COMPLETE"));
     body.appendChild(text("h2", "", "Discussion"));
-    body.appendChild(text("p", "lede", state.numImpostors + " impostor" + (state.numImpostors > 1 ? "s" : "") + " hiding among " + state.numPlayers + " agents. Talk it out, then vote."));
+    body.appendChild(text("p", "lede", state.numImpostors + " impostor" + (state.numImpostors > 1 ? "s" : "") + " hiding among " + state.numPlayers + " players. Talk it out, then vote."));
 
     var ring = el("div", { class: "timer-ring" });
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -378,8 +378,8 @@
     for (var i = 0; i < state.numPlayers; i++) {
       var isImp = state.roles[i];
       roster.appendChild(el("div", { class: "roster-row" }, [
-        text("span", "", "Agent " + (i + 1)),
-        el("span", { class: "agent-tag " + (isImp ? "impostor" : "crew") }, [document.createTextNode(isImp ? "Impostor" : "Crew")])
+        text("span", "", "Player " + (i + 1)),
+        el("span", { class: "player-tag " + (isImp ? "impostor" : "crew") }, [document.createTextNode(isImp ? "Impostor" : "Crew")])
       ]));
     }
     body.appendChild(roster);
@@ -396,7 +396,7 @@
         state.screen = "handoff";
         render();
       }
-    }, [document.createTextNode("Play again, same agents")]));
+    }, [document.createTextNode("Play again, same players")]));
     body.appendChild(el("button", {
       class: "btn btn-ghost",
       onclick: function () { state.screen = "setup"; render(); }

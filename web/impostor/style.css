@@ -69,7 +69,7 @@ body {
   line-height: 1.5;
   -webkit-tap-highlight-color: transparent;
 }
-h1, h2, .stamp, .btn, .eyebrow, .chip, .stepper button, .agent-tag {
+h1, h2, .stamp, .btn, .eyebrow, .chip, .stepper button, .player-tag {
   font-family: Impact, "Arial Narrow Bold", "Arial Black", sans-serif;
   font-weight: 400;
 }
@@ -254,11 +254,11 @@ p { margin: 0; color: var(--text-muted); }
   padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
   background: var(--surface-alt);
 }
-.agent-tag {
+.player-tag {
   font-size: 0.68rem; letter-spacing: 0.1em; padding: 5px 10px; border-radius: 999px;
 }
-.agent-tag.crew { background: color-mix(in srgb, var(--safe) 20%, transparent); color: var(--safe); }
-.agent-tag.impostor { background: color-mix(in srgb, var(--danger) 20%, transparent); color: var(--danger); }
+.player-tag.crew { background: color-mix(in srgb, var(--safe) 20%, transparent); color: var(--safe); }
+.player-tag.impostor { background: color-mix(in srgb, var(--danger) 20%, transparent); color: var(--danger); }
 
 /* timer */
 .timer-ring { position: relative; width: 200px; height: 200px; margin: 0 auto; }

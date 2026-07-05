@@ -222,6 +222,46 @@ p { margin: 0; color: var(--text-muted); }
   border-top: 1px dashed var(--border); padding-top: 12px;
 }
 
+/* names screen */
+.name-list { display: flex; flex-direction: column; gap: 8px; }
+.name-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.name-row .name-index {
+  font-family: "SF Mono", ui-monospace, monospace;
+  font-size: 0.72rem; color: var(--text-muted); width: 24px; flex-shrink: 0;
+  text-align: right;
+}
+.name-input {
+  flex: 1; min-width: 0;
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-size: 0.95rem; color: var(--text);
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+}
+.name-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* suspect selection list */
+.choice-list { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; }
+.choice-btn {
+  display: block; width: 100%;
+  font-family: Georgia, "Iowan Old Style", serif; font-size: 1rem;
+  color: var(--text); text-align: left;
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; cursor: pointer;
+}
+.choice-btn.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface-alt));
+}
+
+/* results tally */
+.roster-row.tally-row { flex-direction: column; align-items: stretch; gap: 6px; }
+.tally-top { display: flex; align-items: center; justify-content: space-between; }
+.tally-voters {
+  font-size: 0.78rem; color: var(--text-muted);
+}
+
 .btn {
   appearance: none; border: none; cursor: pointer;
   border-radius: 12px; padding: 16px 20px;

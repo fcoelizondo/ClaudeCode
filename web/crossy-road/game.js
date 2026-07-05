@@ -11,8 +11,12 @@
   const ROWS_AHEAD_BUFFER = 14;
   const ROWS_BEHIND_KEEP = 6;
   const PLAYER_HALF_WIDTH = 12;
-  const EDGE_ZONE_FRACTION = 0.16; // fraction of screen width tappable as left/right hot areas
-  const EDGE_ZONE_MIN = 56, EDGE_ZONE_MAX = 130; // px clamp so it stays sane on tiny/huge screens
+  // Left/right thirds of the screen strafe; the middle third hops forward.
+  // (A narrow edge-only strip was too easy to miss on a real phone: a tap
+  // anywhere short of the very edge fell through to "forward" and looked
+  // like sideways movement was broken, especially when sidestepping a tree.)
+  const EDGE_ZONE_FRACTION = 1 / 3;
+  const EDGE_ZONE_MIN = 90, EDGE_ZONE_MAX = 220; // px clamp so it stays sane on tiny/huge screens
   const BEST_SCORE_KEY = 'crossyroad.bestScore';
   const CAR_COLORS = ['#e0473f', '#3b82f6', '#f2994a', '#f2d84a', '#9b5de5'];
 
@@ -405,19 +409,20 @@
       if (this.state === 'playing') this.drawEdgeHints();
     }
 
-    // Faint chevrons marking the tap-to-strafe zones along the screen edges.
+    // Faint chevrons marking the tap-to-strafe zones (centered in each zone).
     drawEdgeHints() {
       const ctx = this.ctx;
       const edge = this.edgeZoneWidth();
       const midY = this.height * 0.5;
+      const fontSize = Math.min(40, Math.max(26, edge * 0.22));
       ctx.save();
       ctx.globalAlpha = 0.16;
       ctx.fillStyle = '#ffffff';
-      ctx.font = `${Math.round(edge * 0.5)}px -apple-system, sans-serif`;
+      ctx.font = `${Math.round(fontSize)}px -apple-system, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('‹', edge * 0.4, midY);
-      ctx.fillText('›', this.width - edge * 0.4, midY);
+      ctx.fillText('‹', edge * 0.5, midY);
+      ctx.fillText('›', this.width - edge * 0.5, midY);
       ctx.restore();
     }
 

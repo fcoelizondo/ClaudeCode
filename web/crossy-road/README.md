@@ -5,8 +5,9 @@ step, no dependencies — open `index.html` directly or serve the folder.
 
 ## Controls
 
-- Swipe up, tap, or press **↑ / W** to hop forward.
-- Swipe left/right or press **← / A**, **→ / D** to strafe.
+- Swipe up, tap the middle of the screen, or press **↑ / W** to hop forward.
+- Swipe left/right, tap the (faintly marked) strip along the left/right
+  screen edges, or press **← / A**, **→ / D** to strafe.
 - There's no way to move backward — grass rows are safe (watch for
   trees blocking a tile), road rows have moving cars, water rows only
   have logs to hop across.

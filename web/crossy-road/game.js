@@ -11,6 +11,8 @@
   const ROWS_AHEAD_BUFFER = 14;
   const ROWS_BEHIND_KEEP = 6;
   const PLAYER_HALF_WIDTH = 12;
+  const EDGE_ZONE_FRACTION = 0.16; // fraction of screen width tappable as left/right hot areas
+  const EDGE_ZONE_MIN = 56, EDGE_ZONE_MAX = 130; // px clamp so it stays sane on tiny/huge screens
   const BEST_SCORE_KEY = 'crossyroad.bestScore';
   const CAR_COLORS = ['#e0473f', '#3b82f6', '#f2994a', '#f2d84a', '#9b5de5'];
 
@@ -88,7 +90,7 @@
         const dy = e.clientY - startY;
         const adx = Math.abs(dx), ady = Math.abs(dy);
         if (adx < SWIPE_THRESHOLD && ady < SWIPE_THRESHOLD) {
-          this.handleTap();
+          this.handleTapAt(e.clientX);
         } else if (ady > adx) {
           if (dy < 0) this.attemptMove(0, 1); // swipe up; swipe down is ignored (no backward move)
         } else {
@@ -116,6 +118,22 @@
     handleTap() {
       if (this.state === 'ready') this.startPlaying();
       else if (this.state === 'playing') this.attemptMove(0, 1);
+    }
+
+    edgeZoneWidth() {
+      return Math.min(EDGE_ZONE_MAX, Math.max(EDGE_ZONE_MIN, this.width * EDGE_ZONE_FRACTION));
+    }
+
+    // A tap (not a swipe) in the left/right edge strip strafes instead of
+    // hopping forward, so lateral moves don't require a full swipe gesture.
+    handleTapAt(clientX) {
+      if (this.state === 'ready') { this.startPlaying(); return; }
+      if (this.state !== 'playing') return;
+
+      const edge = this.edgeZoneWidth();
+      if (clientX < edge) this.attemptMove(-1, 0);
+      else if (clientX > this.width - edge) this.attemptMove(1, 0);
+      else this.attemptMove(0, 1);
     }
 
     // ---- Lane generation (mirrors LaneGenerator/GameModels.swift) ----
@@ -384,6 +402,23 @@
 
       for (const lane of this.lanes.values()) this.drawLane(lane);
       this.drawPlayer();
+      if (this.state === 'playing') this.drawEdgeHints();
+    }
+
+    // Faint chevrons marking the tap-to-strafe zones along the screen edges.
+    drawEdgeHints() {
+      const ctx = this.ctx;
+      const edge = this.edgeZoneWidth();
+      const midY = this.height * 0.5;
+      ctx.save();
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `${Math.round(edge * 0.5)}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('‹', edge * 0.4, midY);
+      ctx.fillText('›', this.width - edge * 0.4, midY);
+      ctx.restore();
     }
 
     drawLane(lane) {
@@ -519,5 +554,5 @@
     }
   }
 
-  window.addEventListener('DOMContentLoaded', () => new Game());
+  window.addEventListener('DOMContentLoaded', () => { window.__crossyRoad = new Game(); });
 })();

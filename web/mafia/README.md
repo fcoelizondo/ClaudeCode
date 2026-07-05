@@ -17,12 +17,14 @@ a loop of three stages on one shared device:
    whatever their role calls for — the Doctor picks someone to protect,
    the Detective picks someone to investigate and privately learns if
    they're Mafia — while everyone else just sees "nothing to do." Every
-   turn is the same shape (tap a name, hold to confirm and pass on), so
-   no one can guess a player's role from how long their turn takes or how
-   many times they tap the screen. The Detective's turn locks in their
-   pick on the first hold — the result only appears after that, for that
-   one pick, and the name list disappears so there's no way to check
-   anyone else that turn.
+   turn is the same shape (tap something, hold to confirm and pass on),
+   so no one can guess a player's role from how long their turn takes or
+   how many times they tap the screen. Villagers get a single non-player
+   button ("Nothing to decide — tap here") instead of a name list, making
+   it explicit that the tap is a no-op and not a real choice. The
+   Detective's turn locks in their pick on the first hold — the result
+   only appears after that, for that one pick, and the name list
+   disappears so there's no way to check anyone else that turn.
 
    Each Mafia player picks a target and sees the current pick from
    whichever teammate went before them, so they can tap the same name to

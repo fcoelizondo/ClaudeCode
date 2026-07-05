@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Crossy Road</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Crossy Road">
+<meta name="theme-color" content="#8cc7f2">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="score">0</div>
+    <div id="best">BEST 0</div>
+  </div>
+
+  <div id="ready-overlay" class="overlay">
+    <div class="panel">
+      <h1>CROSSY ROAD</h1>
+      <p>Swipe or tap to hop forward</p>
+      <p>Swipe left / right to dodge</p>
+      <button id="start-btn" class="btn">TAP TO PLAY</button>
+    </div>
+  </div>
+
+  <div id="gameover-overlay" class="overlay hidden">
+    <div class="panel">
+      <h1>GAME OVER</h1>
+      <p id="final-score">Score: 0</p>
+      <p id="final-best">Best: 0</p>
+      <button id="restart-btn" class="btn">TAP TO RESTART</button>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

@@ -2,45 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Crossy Road</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Crossy Road">
-<meta name="theme-color" content="#8cc7f2">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="icon" href="icon.svg">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Games</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: #14181c;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  a.game-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #1f2530;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  a.game-card:active {
+    transform: scale(0.97);
+    background: #262d3a;
+  }
+  .game-card .icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 12px;
+    display: block;
+    border-radius: 14px;
+  }
+  .game-card .name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+</style>
 </head>
 <body>
-<div id="app">
-  <canvas id="game"></canvas>
-
-  <div id="hud">
-    <div id="score">0</div>
-    <div id="best">BEST 0</div>
+<main>
+  <h1>Games</h1>
+  <div class="grid">
+    <a class="game-card" href="crossy-road/">
+      <img class="icon" src="crossy-road/icon.svg" alt="">
+      <div class="name">Crossy Road</div>
+    </a>
   </div>
-
-  <div id="ready-overlay" class="overlay">
-    <div class="panel">
-      <h1>CROSSY ROAD</h1>
-      <p>Swipe or tap to hop forward</p>
-      <p>Swipe left / right to dodge</p>
-      <button id="start-btn" class="btn">TAP TO PLAY</button>
-    </div>
-  </div>
-
-  <div id="gameover-overlay" class="overlay hidden">
-    <div class="panel">
-      <h1>GAME OVER</h1>
-      <p id="final-score">Score: 0</p>
-      <p id="final-best">Best: 0</p>
-      <button id="restart-btn" class="btn">TAP TO RESTART</button>
-    </div>
-  </div>
-</div>
-
-<script src="game.js"></script>
+</main>
 </body>
 </html>

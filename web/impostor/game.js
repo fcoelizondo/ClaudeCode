@@ -68,7 +68,17 @@
       votedBy: "Voted by:",
       noVotes: "No votes",
       crewWinsBanner: "CREW WINS",
-      impostorsWinBanner: "IMPOSTORS WIN"
+      impostorsWinBanner: "IMPOSTORS WIN",
+      howToPlay: "How to play",
+      helpTitle: "HOW TO PLAY",
+      helpStage1Title: "1. Assign",
+      helpStage1Body: "Pass the device around. Each player holds the button to reveal their word — or their impostor status and the category — then holds again to hide it before passing it on.",
+      helpStage2Title: "2. Discuss",
+      helpStage2Body: "Going in order, everyone says one word related to the case file, without saying the word itself. After a full round, decide together whether to do another.",
+      helpStage3Title: "3. Vote",
+      helpStage3Body: "Pass the device once more. Each player secretly picks who they suspect. Once everyone's voted, reveal the word, every role, and who voted for whom.",
+      helpImpostorNote: "The impostor(s) only see the category, never the word — they have to bluff.",
+      helpClose: "Got it"
     },
     es: {
       channel: "CANAL SEGURO // IMPOSTOR",
@@ -118,7 +128,17 @@
       votedBy: "Votado por:",
       noVotes: "Sin votos",
       crewWinsBanner: "GANA LA TRIPULACIÓN",
-      impostorsWinBanner: "GANAN LOS IMPOSTORES"
+      impostorsWinBanner: "GANAN LOS IMPOSTORES",
+      howToPlay: "Cómo jugar",
+      helpTitle: "CÓMO JUGAR",
+      helpStage1Title: "1. Asignación",
+      helpStage1Body: "Pasen el dispositivo. Cada jugador mantiene presionado el botón para ver su palabra —o su condición de impostor y la categoría— y luego lo mantiene presionado de nuevo para ocultarla antes de pasarlo.",
+      helpStage2Title: "2. Discusión",
+      helpStage2Body: "Por turnos, cada quien dice una palabra relacionada con el expediente, sin decir la palabra en sí. Tras una ronda completa, decidan juntos si quieren otra.",
+      helpStage3Title: "3. Votación",
+      helpStage3Body: "Pasen el dispositivo una vez más. Cada quien elige en secreto a quien sospecha. Cuando todos hayan votado, revelen la palabra, cada rol y quién votó por quién.",
+      helpImpostorNote: "El/los impostor(es) solo ven la categoría, nunca la palabra — tienen que farolear.",
+      helpClose: "Entendido"
     }
   };
 
@@ -146,7 +166,8 @@
     votes: [],
     voteIndex: 0,
     pendingVote: null,
-    confirmReveal: false
+    confirmReveal: false,
+    showHelp: false
   };
 
   function t(key) { return STRINGS[state.lang][key]; }
@@ -156,6 +177,15 @@
     localStorage.setItem(LANG_KEY, lang);
     render();
   }
+
+  function setHelp(open) {
+    state.showHelp = open;
+    render();
+  }
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && state.showHelp) setHelp(false);
+  });
 
   function maxImpostors(n) {
     return Math.max(1, Math.min(4, Math.floor(n / 3)));
@@ -271,6 +301,31 @@
     return toggle;
   }
 
+  function helpOverlay() {
+    var stages = [
+      [t("helpStage1Title"), t("helpStage1Body")],
+      [t("helpStage2Title"), t("helpStage2Body")],
+      [t("helpStage3Title"), t("helpStage3Body")]
+    ];
+    var card = el("div", { class: "help-card" }, [
+      text("div", "eyebrow", t("helpTitle"))
+    ]);
+    stages.forEach(function (stage) {
+      card.appendChild(text("h2", "help-stage-title", stage[0]));
+      card.appendChild(text("p", "lede", stage[1]));
+    });
+    card.appendChild(text("p", "", t("helpImpostorNote")));
+    card.appendChild(el("button", {
+      class: "btn btn-primary",
+      onclick: function () { setHelp(false); }
+    }, [document.createTextNode(t("helpClose"))]));
+
+    return el("div", {
+      class: "help-overlay",
+      onclick: function (ev) { if (ev.target === ev.currentTarget) setHelp(false); }
+    }, [card]);
+  }
+
   function progressForScreen() {
     if (state.screen === "handoff" || state.screen === "reveal") {
       return { index: state.currentIndex, total: state.numPlayers };
@@ -372,6 +427,10 @@
     ]));
     body.appendChild(text("h1", "", t("title")));
     body.appendChild(text("p", "lede", t("lede")));
+    body.appendChild(el("button", {
+      class: "link-btn",
+      onclick: function () { setHelp(true); }
+    }, [document.createTextNode(t("howToPlay"))]));
 
     // players stepper
     var playersField = el("div", { class: "field" });
@@ -719,6 +778,7 @@
     else if (state.screen === "vote-complete") screenEl = screenVoteComplete();
     else screenEl = screenResults();
     device.appendChild(screenEl);
+    if (state.showHelp) device.appendChild(helpOverlay());
   }
 
   render();

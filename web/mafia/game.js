@@ -35,7 +35,8 @@
       holdToAct: "Hold to take your turn",
       nightHandoffLede: "Everyone else, look away. Hold the button below when it's your turn.",
       doctorSelectEyebrow: "DOCTOR'S CHOICE",
-      doctorSelectLede: "Choose one player to protect tonight.",
+      doctorSelectLede: "You are the Doctor. Choose one player to protect tonight — if the Mafia targets them, they'll survive instead of being eliminated. You may protect yourself.",
+      doctorSelectHint: "Select someone to protect to continue.",
       detectiveSelectEyebrow: "INVESTIGATION",
       detectiveSelectLede: "You are the Detective. Choose one player to investigate — you'll learn whether they're Mafia or not. You may share what you learn with other players if you choose.",
       detectiveResultMafia: "is Mafia.",
@@ -129,7 +130,8 @@
       holdToAct: "Mantén presionado para tu turno",
       nightHandoffLede: "Que los demás no miren. Mantén presionado el botón cuando sea tu turno.",
       doctorSelectEyebrow: "ELECCIÓN DEL DOCTOR",
-      doctorSelectLede: "Elige a un jugador para proteger esta noche.",
+      doctorSelectLede: "Eres el Doctor. Elige a un jugador para proteger esta noche — si la Mafia lo elige como objetivo, sobrevivirá en lugar de ser eliminado. Puedes protegerte a ti mismo.",
+      doctorSelectHint: "Elige a alguien para proteger y continuar.",
       detectiveSelectEyebrow: "INVESTIGACIÓN",
       detectiveSelectLede: "Eres el Detective. Elige a un jugador para investigar — descubrirás si es Mafia o no. Puedes compartir lo que descubras con otros jugadores si así lo deseas.",
       detectiveResultMafia: "es Mafia.",
@@ -903,7 +905,8 @@
     }
 
     if (state.turnPick === null) {
-      body.appendChild(text("p", "", role === "village" ? t("noActionHint") : t("selectHint")));
+      var hintKey = role === "village" ? "noActionHint" : role === "doctor" ? "doctorSelectHint" : "selectHint";
+      body.appendChild(text("p", "", t(hintKey)));
     } else {
       body.appendChild(holdControl(t("confirmAndContinue"), function () {
         finalizeNightTurn();

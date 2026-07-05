@@ -24,9 +24,10 @@
       roleStampDetective: "DETECTIVE",
       roleStampDoctor: "DOCTOR",
       villageInstructions: "Find the Mafia before they take over the village. You have no special power — just your wits.",
-      mafiaInstructions: "Blend in by day. Each night, choose someone to eliminate — your fellow Mafia will see your pick and can agree or propose someone else. If you can't agree, the night starts over once; still no agreement and no one dies.",
-      detectiveInstructions: "Each night you may investigate one player and learn whether they're Mafia.",
-      doctorInstructions: "Each night you may choose one player — including yourself — to protect from elimination.",
+      mafiaInstructions: "Blend in by day. Each night, choose someone to eliminate — your fellow Mafia will see your pick and can agree or propose someone else. If you can't agree, the night restarts once; if you still can't agree, no one dies.",
+      mafiaSoloInstructions: "Blend in by day. Each night, choose someone to eliminate — since you're the only Mafia, your pick is final.",
+      detectiveInstructions: "Each night you may investigate one player and learn whether they're Mafia. You may share what you learn with other players if you choose.",
+      doctorInstructions: "Each night you may choose one player — including yourself — to protect from elimination. If the Mafia targets them, they'll survive instead of dying.",
       teammatesLabel: "Your fellow Mafia:",
       holdToConceal: "Hold to conceal & pass on",
       nightTitle: "Night falls",
@@ -43,6 +44,7 @@
       detectiveResultInnocent: "is not Mafia.",
       mafiaSelectEyebrow: "MAFIA'S TARGET",
       mafiaSelectLede: "You're the first Mafia to choose. Pick someone to eliminate — your fellow Mafia will see your pick and can agree, or propose someone else.",
+      mafiaSoloLede: "Choose one player to eliminate tonight. You're the only Mafia, so your pick is final.",
       mafiaProposalLede: "is the current pick from your fellow Mafia. Tap them again to agree, or tap someone else to propose a different target.",
       noActionEyebrow: "QUIET NIGHT",
       noActionLede: "You have no power tonight. It doesn't matter what you tap — tap the button below, then hold to pass the device on.",
@@ -63,6 +65,7 @@
       voteHandoffLede: "Everyone else, look away. Hold the button below to cast your vote secretly.",
       holdToVote: "Hold to vote",
       whoToEliminateEyebrow: "WHO SHOULD HANG?",
+      voteSelectLede: "Choose who you want to vote out.",
       selectHint: "Select a suspect to continue.",
       lockInVote: "Hold to lock in vote & pass on",
       allVotesEyebrow: "ALL VOTES CAST",
@@ -119,9 +122,10 @@
       roleStampDetective: "DETECTIVE",
       roleStampDoctor: "DOCTOR",
       villageInstructions: "Encuentra a la Mafia antes de que tome el pueblo. No tienes poder especial — solo tu ingenio.",
-      mafiaInstructions: "Pasa desapercibido de día. Cada noche, elige a alguien para eliminar — tus compañeros de Mafia verán tu elección y podrán estar de acuerdo o proponer a alguien más. Si no se ponen de acuerdo, la noche vuelve a empezar una vez; si siguen sin acuerdo, nadie muere.",
-      detectiveInstructions: "Cada noche puedes investigar a un jugador y descubrir si es Mafia.",
-      doctorInstructions: "Cada noche puedes elegir a un jugador —incluyéndote a ti mismo— para protegerlo de la eliminación.",
+      mafiaInstructions: "Pasa desapercibido de día. Cada noche, elige a alguien para eliminar — tus compañeros de Mafia verán tu elección y podrán estar de acuerdo o proponer a alguien más. Si no se ponen de acuerdo, la noche vuelve a empezar una vez; si aún no se ponen de acuerdo, nadie muere.",
+      mafiaSoloInstructions: "Pasa desapercibido de día. Cada noche, elige a alguien para eliminar — como eres el único mafioso, tu elección es definitiva.",
+      detectiveInstructions: "Cada noche puedes investigar a un jugador y descubrir si es Mafia. Puedes compartir lo que descubras con otros jugadores si así lo deseas.",
+      doctorInstructions: "Cada noche puedes elegir a un jugador —incluyéndote a ti mismo— para protegerlo de la eliminación. Si la Mafia lo elige como objetivo, sobrevivirá en lugar de morir.",
       teammatesLabel: "Tus compañeros de Mafia:",
       holdToConceal: "Mantén presionado para ocultar y pasar",
       nightTitle: "Cae la noche",
@@ -138,6 +142,7 @@
       detectiveResultInnocent: "no es Mafia.",
       mafiaSelectEyebrow: "OBJETIVO DE LA MAFIA",
       mafiaSelectLede: "Eres el primer mafioso en elegir. Elige a alguien para eliminar — tus compañeros de Mafia verán tu elección y podrán estar de acuerdo o proponer a alguien más.",
+      mafiaSoloLede: "Elige a un jugador para eliminar esta noche. Eres el único mafioso, así que tu elección es definitiva.",
       mafiaProposalLede: "es la elección actual de tus compañeros de Mafia. Tócalo de nuevo para estar de acuerdo, o toca a alguien más para proponer un objetivo diferente.",
       noActionEyebrow: "NOCHE TRANQUILA",
       noActionLede: "No tienes poder esta noche. No importa qué toques — toca el botón de abajo y luego mantén presionado para pasar el dispositivo.",
@@ -158,6 +163,7 @@
       voteHandoffLede: "Que los demás no miren. Mantén presionado el botón para votar en secreto.",
       holdToVote: "Mantén presionado para votar",
       whoToEliminateEyebrow: "¿QUIÉN DEBE CAER?",
+      voteSelectLede: "Elige a quién quieres votar para eliminar.",
       selectHint: "Elige a un sospechoso para continuar.",
       lockInVote: "Mantén presionado para confirmar tu voto y pasar",
       allVotesEyebrow: "TODOS VOTARON",
@@ -781,7 +787,15 @@
       : role === "detective" ? t("roleStampDetective")
       : role === "doctor" ? t("roleStampDoctor")
       : t("roleStampVillage");
-    var instructions = role === "mafia" ? t("mafiaInstructions")
+
+    var teammates = [];
+    if (role === "mafia") {
+      for (var i = 0; i < state.numPlayers; i++) {
+        if (i !== state.currentIndex && state.roles[i] === "mafia") teammates.push(i);
+      }
+    }
+
+    var instructions = role === "mafia" ? (teammates.length ? t("mafiaInstructions") : t("mafiaSoloInstructions"))
       : role === "detective" ? t("detectiveInstructions")
       : role === "doctor" ? t("doctorInstructions")
       : t("villageInstructions");
@@ -790,10 +804,6 @@
     body.appendChild(text("p", "lede", instructions));
 
     if (role === "mafia") {
-      var teammates = [];
-      for (var i = 0; i < state.numPlayers; i++) {
-        if (i !== state.currentIndex && state.roles[i] === "mafia") teammates.push(i);
-      }
       if (teammates.length) {
         body.appendChild(text("div", "field-label", t("teammatesLabel")));
         var pills = el("div", { class: "teammates" });
@@ -886,8 +896,11 @@
       body.appendChild(targetChoiceList(-1, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
     } else if (role === "mafia") {
       var villageAlive = aliveIndices().filter(function (i) { return state.roles[i] !== "mafia"; });
+      var otherMafiaAlive = aliveIndices().filter(function (i) { return state.roles[i] === "mafia" && i !== idx; });
       body.appendChild(text("div", "eyebrow", t("mafiaSelectEyebrow")));
-      if (state.mafiaProposal !== null) {
+      if (otherMafiaAlive.length === 0) {
+        body.appendChild(text("p", "lede", t("mafiaSoloLede")));
+      } else if (state.mafiaProposal !== null) {
         body.appendChild(text("p", "lede", playerLabel(state.mafiaProposal) + " " + t("mafiaProposalLede")));
       } else {
         body.appendChild(text("p", "lede", t("mafiaSelectLede")));
@@ -995,6 +1008,7 @@
     var body = el("div", { class: "screen" });
     body.appendChild(text("div", "eyebrow", t("whoToEliminateEyebrow")));
     body.appendChild(text("h2", "", playerLabel(voterIdx) + ","));
+    body.appendChild(text("p", "lede", t("voteSelectLede")));
 
     var list = el("div", { class: "choice-list" });
     state.voteOrder.forEach(function (idx) {

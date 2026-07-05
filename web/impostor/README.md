@@ -10,6 +10,14 @@ another to conceal it before passing the device on. Once everyone has
 seen their role, a discussion timer runs before the full roster —
 including the word and who was the impostor — is revealed.
 
+The setup screen has an EN/ES toggle that switches the UI copy, the
+category names, and the word bank itself (not just a translation layer —
+each language has its own word lists). The choice is remembered in
+`localStorage` between visits. Internally the selected word is stored as
+a language-independent `{ category, index }` pick and resolved to text
+at render time, so switching languages never changes the secret word
+mid-round — it just relabels it.
+
 ## Files
 
 - `index.html` — page shell; mounts the app into `#device`.

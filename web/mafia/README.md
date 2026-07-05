@@ -16,13 +16,19 @@ a loop of three stages on one shared device:
    a time, the same way the day vote does. Whoever is holding it sees
    whatever their role calls for — the Doctor picks someone to protect,
    the Detective picks someone to investigate and privately learns if
-   they're Mafia, each Mafia player secretly picks someone to eliminate
-   (their target only becomes the kill if enough of their teammates agree)
-   — while everyone else just sees "nothing to do." Every turn is the same
-   shape (tap a name, hold to confirm and pass on), so no one can guess a
-   player's role from how long their turn takes or how many times they
-   tap the screen. The night resolves after the last player's turn,
-   immediately if the Mafia's target was protected.
+   they're Mafia — while everyone else just sees "nothing to do." Every
+   turn is the same shape (tap a name, hold to confirm and pass on), so
+   no one can guess a player's role from how long their turn takes or how
+   many times they tap the screen.
+
+   Each Mafia player picks a target and sees the current pick from
+   whichever teammate went before them, so they can tap the same name to
+   agree or a different one to overrule it. If every Mafia player's final
+   pick matches by the end of the round, that's the kill (unless the
+   Doctor protected them). If they don't all agree, the device announces
+   it and every player — Mafia included — passes through the night once
+   more to try again. A second round with no agreement means no one is
+   attacked that night.
 3. **Day** — the device announces who died (if anyone) and their role,
    then the group discusses out loud. Pass the device once more for a
    secret vote: each living player picks who to eliminate. A tap-to-hold

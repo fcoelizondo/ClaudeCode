@@ -212,6 +212,7 @@
     nightOrder: [],
     nightStepIdx: 0,
     turnPick: null,
+    turnRevealed: false, // detective-only: whether this turn's investigation result has been unlocked
     doctorProtect: null,
     mafiaVotes: {},      // mafiaPlayerIndex -> targetIndex, checked for consensus at end of round
     mafiaProposal: null, // rolling current pick, shown to the next Mafia player to act
@@ -356,6 +357,7 @@
     state.nightOrder = aliveIndices();
     state.nightStepIdx = 0;
     state.turnPick = null;
+    state.turnRevealed = false;
     state.doctorProtect = null;
     state.mafiaVotes = {};
     state.mafiaProposal = null;
@@ -376,6 +378,7 @@
     if (state.nightStepIdx + 1 < state.nightOrder.length) {
       state.nightStepIdx += 1;
       state.turnPick = null;
+      state.turnRevealed = false;
       state.screen = "night-handoff";
     } else {
       resolveNight();
@@ -842,18 +845,39 @@
     var role = state.roles[idx];
     var body = el("div", { class: "screen night" });
 
+    if (role === "detective") {
+      // Detective gets a two-step turn: pick + hold locks in the choice and
+      // reveals the result; a second hold conceals it and passes on. This is
+      // the only role where holding must not immediately advance the turn —
+      // otherwise a player could tap through every name and read every
+      // result before ever confirming, learning everyone's role in one turn.
+      body.appendChild(text("div", "eyebrow", t("detectiveSelectEyebrow")));
+      if (!state.turnRevealed) {
+        body.appendChild(text("p", "lede", t("detectiveSelectLede")));
+        body.appendChild(targetChoiceList(idx, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+        if (state.turnPick === null) {
+          body.appendChild(text("p", "", t("selectHint")));
+        } else {
+          body.appendChild(holdControl(t("confirmAndContinue"), function () {
+            state.turnRevealed = true;
+            render();
+          }));
+        }
+      } else {
+        var isMafia = state.roles[state.turnPick] === "mafia";
+        body.appendChild(text("p", "lede", playerLabel(state.turnPick) + " " + t(isMafia ? "detectiveResultMafia" : "detectiveResultInnocent")));
+        body.appendChild(holdControl(t("holdToConceal"), function () {
+          finalizeNightTurn();
+          render();
+        }));
+      }
+      return body;
+    }
+
     if (role === "doctor") {
       body.appendChild(text("div", "eyebrow", t("doctorSelectEyebrow")));
       body.appendChild(text("p", "lede", t("doctorSelectLede")));
       body.appendChild(targetChoiceList(-1, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
-    } else if (role === "detective") {
-      body.appendChild(text("div", "eyebrow", t("detectiveSelectEyebrow")));
-      body.appendChild(text("p", "lede", t("detectiveSelectLede")));
-      body.appendChild(targetChoiceList(idx, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
-      if (state.turnPick !== null) {
-        var isMafia = state.roles[state.turnPick] === "mafia";
-        body.appendChild(text("p", "lede", playerLabel(state.turnPick) + " " + t(isMafia ? "detectiveResultMafia" : "detectiveResultInnocent")));
-      }
     } else if (role === "mafia") {
       var villageAlive = aliveIndices().filter(function (i) { return state.roles[i] !== "mafia"; });
       body.appendChild(text("div", "eyebrow", t("mafiaSelectEyebrow")));

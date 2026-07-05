@@ -19,7 +19,10 @@ a loop of three stages on one shared device:
    they're Mafia — while everyone else just sees "nothing to do." Every
    turn is the same shape (tap a name, hold to confirm and pass on), so
    no one can guess a player's role from how long their turn takes or how
-   many times they tap the screen.
+   many times they tap the screen. The Detective's turn locks in their
+   pick on the first hold — the result only appears after that, for that
+   one pick, and the name list disappears so there's no way to check
+   anyone else that turn.
 
    Each Mafia player picks a target and sees the current pick from
    whichever teammate went before them, so they can tap the same name to

@@ -24,27 +24,26 @@
       roleStampDetective: "DETECTIVE",
       roleStampDoctor: "DOCTOR",
       villageInstructions: "Find the Mafia before they take over the village. You have no special power — just your wits.",
-      mafiaInstructions: "Blend in by day. Each night, join your fellow Mafia to silently choose someone to eliminate.",
+      mafiaInstructions: "Blend in by day. Each night, secretly choose someone to eliminate — if enough of your fellow Mafia agree, that becomes the kill.",
       detectiveInstructions: "Each night you may investigate one player and learn whether they're Mafia.",
       doctorInstructions: "Each night you may choose one player — including yourself — to protect from elimination.",
       teammatesLabel: "Your fellow Mafia:",
       holdToConceal: "Hold to conceal & pass on",
       nightTitle: "Night falls",
-      nightLede: "Everyone close your eyes. The device will now wake each night role in turn.",
+      nightLede: "The device will visit every player, one at a time. Watch only your own screen — some of you will see an action, most will see nothing to do.",
       continueNight: "Continue →",
       holdToAct: "Hold to take your turn",
-      doctorHandoffTitle: "Pass the device to the Doctor",
+      nightHandoffLede: "Everyone else, look away. Hold the button below when it's your turn.",
       doctorSelectEyebrow: "DOCTOR'S CHOICE",
       doctorSelectLede: "Choose one player to protect tonight.",
-      detectiveHandoffTitle: "Pass the device to the Detective",
       detectiveSelectEyebrow: "INVESTIGATION",
       detectiveSelectLede: "Choose one player to investigate.",
       detectiveResultMafia: "is Mafia.",
       detectiveResultInnocent: "is not Mafia.",
-      mafiaHandoffTitle: "Pass the device to the Mafia",
-      mafiaHandoffLede: "Decide together, quietly. Hold the button below when you're ready to choose.",
       mafiaSelectEyebrow: "MAFIA'S TARGET",
-      mafiaSelectLede: "Choose one player to eliminate tonight.",
+      mafiaSelectLede: "Choose one player to eliminate tonight. Your vote is secret, even from your fellow Mafia.",
+      noActionEyebrow: "QUIET NIGHT",
+      noActionLede: "You have no power tonight. Tap a name, then hold to pass the device on.",
       confirmAndContinue: "Hold to confirm & continue",
       deathAnnouncement: "was found dead. They were the",
       savedAnnouncement: "was attacked in the night — but survived. The doctor made the right call.",
@@ -84,7 +83,7 @@
       helpStage1Title: "1. Assign",
       helpStage1Body: "Pass the device around. Each player holds the button to reveal their role — Villager, Mafia, Detective, or Doctor — then holds again to hide it before passing on. Mafia members learn each other's identities.",
       helpStage2Title: "2. Night",
-      helpStage2Body: "Everyone \"closes their eyes.\" The device wakes the Doctor to protect someone, the Detective to investigate someone, and finally the Mafia to choose a target — each in a private handoff.",
+      helpStage2Body: "The device passes to every player in turn, one at a time. Those with a night role — Doctor, Detective, Mafia — see their action; everyone else sees nothing to do. Watch only your own screen so no one learns who has which role.",
       helpStage3Title: "3. Day",
       helpStage3Body: "The device reports who died (if anyone) and their role. Discuss out loud, then pass the device for a secret vote on who to eliminate.",
       helpStage4Title: "4. Repeat",
@@ -113,27 +112,26 @@
       roleStampDetective: "DETECTIVE",
       roleStampDoctor: "DOCTOR",
       villageInstructions: "Encuentra a la Mafia antes de que tome el pueblo. No tienes poder especial — solo tu ingenio.",
-      mafiaInstructions: "Pasa desapercibido de día. Cada noche, únete a tus compañeros de Mafia para elegir en silencio a quién eliminar.",
+      mafiaInstructions: "Pasa desapercibido de día. Cada noche, elige en secreto a alguien para eliminar — si suficientes de tus compañeros de Mafia coinciden, esa persona muere.",
       detectiveInstructions: "Cada noche puedes investigar a un jugador y descubrir si es Mafia.",
       doctorInstructions: "Cada noche puedes elegir a un jugador —incluyéndote a ti mismo— para protegerlo de la eliminación.",
       teammatesLabel: "Tus compañeros de Mafia:",
       holdToConceal: "Mantén presionado para ocultar y pasar",
       nightTitle: "Cae la noche",
-      nightLede: "Todos cierren los ojos. El dispositivo despertará a cada rol nocturno por turno.",
+      nightLede: "El dispositivo visitará a cada jugador, uno por uno. Miren solo su propia pantalla — algunos verán una acción, la mayoría no verá nada que hacer.",
       continueNight: "Continuar →",
       holdToAct: "Mantén presionado para tu turno",
-      doctorHandoffTitle: "Pasa el dispositivo al Doctor",
+      nightHandoffLede: "Que los demás no miren. Mantén presionado el botón cuando sea tu turno.",
       doctorSelectEyebrow: "ELECCIÓN DEL DOCTOR",
       doctorSelectLede: "Elige a un jugador para proteger esta noche.",
-      detectiveHandoffTitle: "Pasa el dispositivo al Detective",
       detectiveSelectEyebrow: "INVESTIGACIÓN",
       detectiveSelectLede: "Elige a un jugador para investigar.",
       detectiveResultMafia: "es Mafia.",
       detectiveResultInnocent: "no es Mafia.",
-      mafiaHandoffTitle: "Pasa el dispositivo a la Mafia",
-      mafiaHandoffLede: "Decidan juntos, en silencio. Mantén presionado el botón cuando estén listos para elegir.",
       mafiaSelectEyebrow: "OBJETIVO DE LA MAFIA",
-      mafiaSelectLede: "Elige a un jugador para eliminar esta noche.",
+      mafiaSelectLede: "Elige a un jugador para eliminar esta noche. Tu voto es secreto, incluso para tus compañeros de Mafia.",
+      noActionEyebrow: "NOCHE TRANQUILA",
+      noActionLede: "No tienes poder esta noche. Toca un nombre y luego mantén presionado para pasar el dispositivo.",
       confirmAndContinue: "Mantén presionado para confirmar y continuar",
       deathAnnouncement: "fue encontrado muerto. Era",
       savedAnnouncement: "fue atacado durante la noche — pero sobrevivió. El doctor tomó la decisión correcta.",
@@ -173,7 +171,7 @@
       helpStage1Title: "1. Asignación",
       helpStage1Body: "Pasen el dispositivo. Cada jugador mantiene presionado el botón para ver su rol —Aldeano, Mafia, Detective o Doctor— y luego lo oculta antes de pasarlo. Los miembros de la Mafia se reconocen entre sí.",
       helpStage2Title: "2. Noche",
-      helpStage2Body: "Todos \"cierran los ojos\". El dispositivo despierta al Doctor para proteger a alguien, al Detective para investigar a alguien y finalmente a la Mafia para elegir un objetivo — cada uno en un turno privado.",
+      helpStage2Body: "El dispositivo pasa por cada jugador, uno por uno. Quienes tienen un rol nocturno — Doctor, Detective, Mafia — ven su acción; los demás no ven nada que hacer. Miren solo su propia pantalla para que nadie descubra los roles.",
       helpStage3Title: "3. Día",
       helpStage3Body: "El dispositivo reporta quién murió (si alguien) y su rol. Discutan en voz alta y luego pasen el dispositivo para una votación secreta sobre a quién eliminar.",
       helpStage4Title: "4. Repetir",
@@ -203,11 +201,11 @@
     currentIndex: 0,
     revealed: false,
     round: 1,
-    doctorPick: null,
+    nightOrder: [],
+    nightStepIdx: 0,
+    turnPick: null,
     doctorProtect: null,
-    detectivePick: null,
-    detectiveResult: null,
-    mafiaPick: null,
+    mafiaVotes: {},    // mafiaPlayerIndex -> targetIndex, tallied at end of night
     mafiaTarget: null,
     nightOutcome: null, // { diedIndex: number|null, saved: bool }
     voteOrder: [],
@@ -339,40 +337,52 @@
   }
 
   function beginNight() {
-    state.doctorPick = null;
+    state.nightOrder = aliveIndices();
+    state.nightStepIdx = 0;
+    state.turnPick = null;
     state.doctorProtect = null;
-    state.detectivePick = null;
-    state.detectiveResult = null;
-    state.mafiaPick = null;
+    state.mafiaVotes = {};
     state.mafiaTarget = null;
     state.nightOutcome = null;
     state.screen = "night-intro";
   }
 
-  function firstNightStep() {
-    if (state.hasDoctor && isRoleAlive("doctor")) return "doctor-handoff";
-    if (state.hasDetective && isRoleAlive("detective")) return "detective-handoff";
-    return "mafia-handoff";
+  function currentNightIdx() {
+    return state.nightOrder[state.nightStepIdx];
   }
 
-  function roleIndex(role) {
-    for (var i = 0; i < state.numPlayers; i++) if (state.roles[i] === role) return i;
-    return -1;
-  }
-  function isRoleAlive(role) {
-    var i = roleIndex(role);
-    return i >= 0 && state.alive[i];
+  function advanceNightTurn() {
+    if (state.nightStepIdx + 1 < state.nightOrder.length) {
+      state.nightStepIdx += 1;
+      state.turnPick = null;
+      state.screen = "night-handoff";
+    } else {
+      resolveNight();
+    }
   }
 
-  function afterDoctor() {
-    if (state.hasDetective && isRoleAlive("detective")) { state.screen = "detective-handoff"; }
-    else { state.screen = "mafia-handoff"; }
+  function finalizeNightTurn() {
+    var idx = currentNightIdx();
+    var role = state.roles[idx];
+    if (role === "doctor") state.doctorProtect = state.turnPick;
+    else if (role === "mafia") state.mafiaVotes[idx] = state.turnPick;
+    advanceNightTurn();
   }
-  function afterDetective() {
-    state.screen = "mafia-handoff";
+
+  function tallyMafiaVotes() {
+    var counts = {};
+    Object.keys(state.mafiaVotes).forEach(function (voterIdx) {
+      var candidate = state.mafiaVotes[voterIdx];
+      counts[candidate] = (counts[candidate] || 0) + 1;
+    });
+    var maxCount = 0;
+    Object.keys(counts).forEach(function (k) { if (counts[k] > maxCount) maxCount = counts[k]; });
+    var top = Object.keys(counts).filter(function (k) { return counts[k] === maxCount; }).map(Number);
+    return (maxCount > 0 && top.length === 1) ? top[0] : null;
   }
 
   function resolveNight() {
+    state.mafiaTarget = tallyMafiaVotes();
     var died = null;
     var saved = false;
     if (state.mafiaTarget !== null) {
@@ -483,6 +493,9 @@
     }
     if (state.screen === "vote-handoff" || state.screen === "vote-select") {
       return { index: state.voteStepIdx, total: state.voteOrder.length };
+    }
+    if (state.screen === "night-handoff" || state.screen === "night-turn") {
+      return { index: state.nightStepIdx, total: state.nightOrder.length };
     }
     return null;
   }
@@ -762,17 +775,8 @@
     body.appendChild(el("div", { class: "spacer" }));
     body.appendChild(el("button", {
       class: "btn btn-primary",
-      onclick: function () { state.screen = firstNightStep(); render(); }
+      onclick: function () { state.screen = "night-handoff"; render(); }
     }, [document.createTextNode(t("continueNight"))]));
-    return body;
-  }
-
-  function screenRoleHandoff(titleKey, ledeKey, onHold) {
-    var body = el("div", { class: "screen center night" });
-    body.appendChild(text("div", "eyebrow", state.lang === "es" ? ("NOCHE " + state.round) : ("NIGHT " + state.round)));
-    body.appendChild(text("h2", "", t(titleKey)));
-    body.appendChild(text("p", "", t(ledeKey)));
-    body.appendChild(holdControl(t("holdToAct"), onHold));
     return body;
   }
 
@@ -788,95 +792,52 @@
     return list;
   }
 
-  function screenDoctorHandoff() {
-    return screenRoleHandoff("doctorHandoffTitle", "handoffLede", function () {
-      state.screen = "doctor-select";
-      render();
-    });
-  }
-  function screenDoctorSelect() {
-    var body = el("div", { class: "screen night" });
-    body.appendChild(text("div", "eyebrow", t("doctorSelectEyebrow")));
-    body.appendChild(text("p", "lede", t("doctorSelectLede")));
-    body.appendChild(targetChoiceList(-1, aliveIndices(), state.doctorPick, function (idx) {
-      state.doctorPick = idx; render();
-    }));
-    if (state.doctorPick === null) {
-      body.appendChild(text("p", "", t("selectHint")));
-    } else {
-      body.appendChild(holdControl(t("confirmAndContinue"), function () {
-        state.doctorProtect = state.doctorPick;
-        afterDoctor();
-        render();
-      }));
-    }
-    return body;
-  }
-
-  function screenDetectiveHandoff() {
-    return screenRoleHandoff("detectiveHandoffTitle", "handoffLede", function () {
-      state.screen = "detective-select";
-      render();
-    });
-  }
-  function screenDetectiveSelect() {
-    var detIdx = roleIndex("detective");
-    var body = el("div", { class: "screen night" });
-    body.appendChild(text("div", "eyebrow", t("detectiveSelectEyebrow")));
-    body.appendChild(text("p", "lede", t("detectiveSelectLede")));
-    body.appendChild(targetChoiceList(detIdx, aliveIndices(), state.detectivePick, function (idx) {
-      state.detectivePick = idx; render();
-    }));
-    if (state.detectivePick === null) {
-      body.appendChild(text("p", "", t("selectHint")));
-    } else {
-      body.appendChild(holdControl(t("confirmAndContinue"), function () {
-        state.detectiveResult = state.roles[state.detectivePick] === "mafia";
-        state.screen = "detective-result";
-        render();
-      }));
-    }
-    return body;
-  }
-  function screenDetectiveResult() {
-    var body = el("div", { class: "screen center night" });
-    var resultKey = state.detectiveResult ? "detectiveResultMafia" : "detectiveResultInnocent";
-    body.appendChild(el("div", { class: "stamp-box " + (state.detectiveResult ? "mafia" : "village") + " animate" }, [
-      text("div", "stamp", playerLabel(state.detectivePick))
-    ]));
-    body.appendChild(text("p", "lede", playerLabel(state.detectivePick) + " " + t(resultKey)));
-    body.appendChild(holdControl(t("holdToConceal"), function () {
-      afterDetective();
-      render();
-    }));
-    return body;
-  }
-
-  function screenMafiaHandoff() {
+  function screenNightHandoff() {
+    var idx = currentNightIdx();
     var body = el("div", { class: "screen center night" });
     body.appendChild(text("div", "eyebrow", state.lang === "es" ? ("NOCHE " + state.round) : ("NIGHT " + state.round)));
-    body.appendChild(text("h2", "", t("mafiaHandoffTitle")));
-    body.appendChild(text("p", "", t("mafiaHandoffLede")));
+    body.appendChild(text("h2", "", (state.lang === "es" ? "Pasa el dispositivo a " : "Pass the device to ") + playerLabel(idx)));
+    body.appendChild(text("p", "", t("nightHandoffLede")));
     body.appendChild(holdControl(t("holdToAct"), function () {
-      state.screen = "mafia-select";
+      state.screen = "night-turn";
       render();
     }));
     return body;
   }
-  function screenMafiaSelect() {
-    var villageAlive = aliveIndices().filter(function (i) { return state.roles[i] !== "mafia"; });
+
+  function screenNightTurn() {
+    var idx = currentNightIdx();
+    var role = state.roles[idx];
     var body = el("div", { class: "screen night" });
-    body.appendChild(text("div", "eyebrow", t("mafiaSelectEyebrow")));
-    body.appendChild(text("p", "lede", t("mafiaSelectLede")));
-    body.appendChild(targetChoiceList(-1, villageAlive, state.mafiaPick, function (idx) {
-      state.mafiaPick = idx; render();
-    }));
-    if (state.mafiaPick === null) {
+
+    if (role === "doctor") {
+      body.appendChild(text("div", "eyebrow", t("doctorSelectEyebrow")));
+      body.appendChild(text("p", "lede", t("doctorSelectLede")));
+      body.appendChild(targetChoiceList(-1, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+    } else if (role === "detective") {
+      body.appendChild(text("div", "eyebrow", t("detectiveSelectEyebrow")));
+      body.appendChild(text("p", "lede", t("detectiveSelectLede")));
+      body.appendChild(targetChoiceList(idx, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+      if (state.turnPick !== null) {
+        var isMafia = state.roles[state.turnPick] === "mafia";
+        body.appendChild(text("p", "lede", playerLabel(state.turnPick) + " " + t(isMafia ? "detectiveResultMafia" : "detectiveResultInnocent")));
+      }
+    } else if (role === "mafia") {
+      var villageAlive = aliveIndices().filter(function (i) { return state.roles[i] !== "mafia"; });
+      body.appendChild(text("div", "eyebrow", t("mafiaSelectEyebrow")));
+      body.appendChild(text("p", "lede", t("mafiaSelectLede")));
+      body.appendChild(targetChoiceList(-1, villageAlive, state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+    } else {
+      body.appendChild(text("div", "eyebrow", t("noActionEyebrow")));
+      body.appendChild(text("p", "lede", t("noActionLede")));
+      body.appendChild(targetChoiceList(idx, aliveIndices(), state.turnPick, function (pick) { state.turnPick = pick; render(); }));
+    }
+
+    if (state.turnPick === null) {
       body.appendChild(text("p", "", t("selectHint")));
     } else {
       body.appendChild(holdControl(t("confirmAndContinue"), function () {
-        state.mafiaTarget = state.mafiaPick;
-        resolveNight();
+        finalizeNightTurn();
         render();
       }));
     }
@@ -1068,13 +1029,8 @@
     else if (state.screen === "assign-handoff") screenEl = screenAssignHandoff();
     else if (state.screen === "assign-reveal") screenEl = screenAssignReveal();
     else if (state.screen === "night-intro") screenEl = screenNightIntro();
-    else if (state.screen === "doctor-handoff") screenEl = screenDoctorHandoff();
-    else if (state.screen === "doctor-select") screenEl = screenDoctorSelect();
-    else if (state.screen === "detective-handoff") screenEl = screenDetectiveHandoff();
-    else if (state.screen === "detective-select") screenEl = screenDetectiveSelect();
-    else if (state.screen === "detective-result") screenEl = screenDetectiveResult();
-    else if (state.screen === "mafia-handoff") screenEl = screenMafiaHandoff();
-    else if (state.screen === "mafia-select") screenEl = screenMafiaSelect();
+    else if (state.screen === "night-handoff") screenEl = screenNightHandoff();
+    else if (state.screen === "night-turn") screenEl = screenNightTurn();
     else if (state.screen === "day-intro") screenEl = screenDayIntro();
     else if (state.screen === "day-discussion") screenEl = screenDayDiscussion();
     else if (state.screen === "vote-handoff") screenEl = screenVoteHandoff();

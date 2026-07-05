@@ -1,0 +1,12 @@
+{
+  "name": "Crossy Road",
+  "short_name": "Crossy Road",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#8cc7f2",
+  "theme_color": "#8cc7f2",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

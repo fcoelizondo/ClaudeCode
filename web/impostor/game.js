@@ -43,6 +43,7 @@
       holdToConceal: "Hold to conceal & pass on",
       caseFileEyebrow: "CASE FILE",
       turnLede: "Say one word related to the case file. Don't say the word itself.",
+      discussionIntro: "Everyone can look now — take turns out loud.",
       turnDone: "Done",
       anotherRoundQuestion: "Another round of one-word clues?",
       anotherRoundHint: "Give everyone a chance to reconsider — impostors tend to get vaguer under pressure.",
@@ -72,12 +73,12 @@
       howToPlay: "How to play",
       helpTitle: "HOW TO PLAY",
       helpStage1Title: "1. Assign",
-      helpStage1Body: "Pass the device around. Each player holds the button to reveal their word — or their impostor status and the category — then holds again to hide it before passing it on.",
+      helpStage1Body: "Pass the device around. Each player holds the button to reveal their word — or their impostor status and the case file — then holds again to hide it before passing it on.",
       helpStage2Title: "2. Discuss",
       helpStage2Body: "Going in order, everyone says one word related to the case file, without saying the word itself. After a full round, decide together whether to do another.",
       helpStage3Title: "3. Vote",
-      helpStage3Body: "Pass the device once more. Each player secretly picks who they suspect. Once everyone's voted, reveal the word, every role, and who voted for whom.",
-      helpImpostorNote: "The impostor(s) only see the category, never the word — they have to bluff.",
+      helpStage3Body: "Pass the device once more. Each player secretly picks who they suspect. Whoever gets the most votes is accused — a tie means no one is, and the impostor(s) get away with it. Then everyone sees the word, every role, and who voted for whom.",
+      helpImpostorNote: "The impostor(s) only see the case file, never the word — they have to bluff.",
       helpClose: "Got it"
     },
     es: {
@@ -97,12 +98,13 @@
       handoffLede: "Que los demás no miren. Mantén presionado el botón para ver tu asignación.",
       holdToView: "Mantén presionado para ver",
       impostorStamp: "IMPOSTOR",
-      impostorInstructions: "No conoces la palabra. Escucha con atención, farolea con confianza e intenta pasar desapercibido.",
+      impostorInstructions: "No conoces la palabra. Escucha con atención, blofea con confianza e intenta pasar desapercibido.",
       yourWordLabel: "Tu palabra",
       crewInstructions: "Descríbela sin decirla directamente. Detecta a quien esté fingiendo.",
       holdToConceal: "Mantén presionado para ocultar y pasar",
       caseFileEyebrow: "EXPEDIENTE",
       turnLede: "Di una palabra relacionada con el expediente. No digas la palabra en sí.",
+      discussionIntro: "Ya pueden mirar todos — túrnense en voz alta.",
       turnDone: "Listo",
       anotherRoundQuestion: "¿Otra ronda de pistas de una palabra?",
       anotherRoundHint: "Denle a todos otra oportunidad — los impostores suelen volverse más vagos bajo presión.",
@@ -132,12 +134,12 @@
       howToPlay: "Cómo jugar",
       helpTitle: "CÓMO JUGAR",
       helpStage1Title: "1. Asignación",
-      helpStage1Body: "Pasen el dispositivo. Cada jugador mantiene presionado el botón para ver su palabra —o su condición de impostor y la categoría— y luego lo mantiene presionado de nuevo para ocultarla antes de pasarlo.",
+      helpStage1Body: "Pasen el dispositivo. Cada jugador mantiene presionado el botón para ver su palabra —o su condición de impostor y el expediente— y luego lo mantiene presionado de nuevo para ocultarla antes de pasarlo.",
       helpStage2Title: "2. Discusión",
       helpStage2Body: "Por turnos, cada quien dice una palabra relacionada con el expediente, sin decir la palabra en sí. Tras una ronda completa, decidan juntos si quieren otra.",
       helpStage3Title: "3. Votación",
-      helpStage3Body: "Pasen el dispositivo una vez más. Cada quien elige en secreto a quien sospecha. Cuando todos hayan votado, revelen la palabra, cada rol y quién votó por quién.",
-      helpImpostorNote: "El/los impostor(es) solo ven la categoría, nunca la palabra — tienen que farolear.",
+      helpStage3Body: "Pasen el dispositivo una vez más. Cada quien elige en secreto a quien sospecha. Quien reciba más votos queda acusado —un empate significa que nadie es acusado, y el/los impostor(es) se salen con la suya—. Luego todos ven la palabra, cada rol y quién votó por quién.",
+      helpImpostorNote: "El/los impostor(es) solo ven el expediente, nunca la palabra — tienen que blofear.",
       helpClose: "Entendido"
     }
   };
@@ -436,17 +438,21 @@
     var playersField = el("div", { class: "field" });
     playersField.appendChild(text("div", "field-label", t("playersLabel")));
     var pOut = el("output", {}, [document.createTextNode(String(state.numPlayers))]);
-    var pMinus = el("button", { onclick: function () {
+    var pMinusAttrs = { onclick: function () {
       state.numPlayers = Math.max(3, state.numPlayers - 1);
       state.numImpostors = Math.min(state.numImpostors, maxImpostors(state.numPlayers));
       resizePlayerNames(state.numPlayers);
       render();
-    } }, [document.createTextNode("–")]);
-    var pPlus = el("button", { onclick: function () {
+    } };
+    if (state.numPlayers <= 3) pMinusAttrs.disabled = "disabled";
+    var pPlusAttrs = { onclick: function () {
       state.numPlayers = Math.min(15, state.numPlayers + 1);
       resizePlayerNames(state.numPlayers);
       render();
-    } }, [document.createTextNode("+")]);
+    } };
+    if (state.numPlayers >= 15) pPlusAttrs.disabled = "disabled";
+    var pMinus = el("button", pMinusAttrs, [document.createTextNode("–")]);
+    var pPlus = el("button", pPlusAttrs, [document.createTextNode("+")]);
     playersField.appendChild(el("div", { class: "stepper" }, [pMinus, pOut, pPlus]));
     body.appendChild(playersField);
 
@@ -454,12 +460,16 @@
     var impField = el("div", { class: "field" });
     impField.appendChild(text("div", "field-label", t("impostorsLabel")));
     var iOut = el("output", {}, [document.createTextNode(String(state.numImpostors))]);
-    var iMinus = el("button", { onclick: function () {
+    var iMinusAttrs = { onclick: function () {
       state.numImpostors = Math.max(1, state.numImpostors - 1); render();
-    } }, [document.createTextNode("–")]);
-    var iPlus = el("button", { onclick: function () {
+    } };
+    if (state.numImpostors <= 1) iMinusAttrs.disabled = "disabled";
+    var iPlusAttrs = { onclick: function () {
       state.numImpostors = Math.min(maxImpostors(state.numPlayers), state.numImpostors + 1); render();
-    } }, [document.createTextNode("+")]);
+    } };
+    if (state.numImpostors >= maxImpostors(state.numPlayers)) iPlusAttrs.disabled = "disabled";
+    var iMinus = el("button", iMinusAttrs, [document.createTextNode("–")]);
+    var iPlus = el("button", iPlusAttrs, [document.createTextNode("+")]);
     impField.appendChild(el("div", { class: "stepper" }, [iMinus, iOut, iPlus]));
     body.appendChild(impField);
 
@@ -572,6 +582,9 @@
     body.appendChild(text("h2", "", state.lang === "es"
       ? ("Turno de " + playerLabel(state.discussionTurnIndex))
       : (playerLabel(state.discussionTurnIndex) + "’s turn")));
+    if (state.discussionRound === 1 && state.discussionTurnIndex === 0) {
+      body.appendChild(text("p", "field-label", t("discussionIntro")));
+    }
     body.appendChild(text("p", "lede", t("turnLede")));
     body.appendChild(el("div", { class: "spacer" }));
     body.appendChild(el("button", {

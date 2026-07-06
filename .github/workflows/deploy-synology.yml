@@ -1,0 +1,45 @@
+name: Mirror web/ to Synology
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-synology.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (show what would change, no actual sync)'
+        type: boolean
+        default: true
+
+concurrency:
+  group: synology-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SYNOLOGY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.SYNOLOGY_PORT }}" "${{ secrets.SYNOLOGY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync web/ to Synology
+        env:
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+        run: |
+          RSYNC_FLAGS="-az --delete"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "::notice::Dry run enabled — no files will actually change on the NAS."
+            RSYNC_FLAGS="$RSYNC_FLAGS --dry-run -v"
+          fi
+          rsync $RSYNC_FLAGS \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SYNOLOGY_PORT }} -o UserKnownHostsFile=~/.ssh/known_hosts" \
+            web/ "${{ secrets.SYNOLOGY_USER }}@${{ secrets.SYNOLOGY_HOST }}:${{ secrets.SYNOLOGY_TARGET_PATH }}/"

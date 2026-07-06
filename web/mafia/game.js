@@ -73,6 +73,7 @@
       revealResultsLede: "Tap reveal to see who was voted out.",
       revealResults: "Reveal results",
       tapAgainReveal: "Tap again to reveal",
+      revealConfirmHint: "Tap again within 3 seconds to confirm.",
       lynchedAnnouncement: "was voted out. They were the",
       tieAnnouncement: "The vote was tied — no one was eliminated.",
       continueToNight: "Continue to night →",
@@ -171,6 +172,7 @@
       revealResultsLede: "Toca revelar para ver a quién votaron fuera.",
       revealResults: "Revelar resultados",
       tapAgainReveal: "Toca de nuevo para revelar",
+      revealConfirmHint: "Toca de nuevo dentro de 3 segundos para confirmar.",
       lynchedAnnouncement: "fue votado fuera. Era",
       tieAnnouncement: "El voto quedó empatado — nadie fue eliminado.",
       continueToNight: "Continuar a la noche →",
@@ -949,7 +951,7 @@
     if (outcome.diedIndex !== null) {
       body.appendChild(text("h2", "", playerLabel(outcome.diedIndex) + " " + t("deathAnnouncement") + " " + roleTag(state.roles[outcome.diedIndex]) + "."));
     } else if (outcome.saved) {
-      body.appendChild(text("h2", "", t("savedAnnouncement")));
+      body.appendChild(text("h2", "", playerLabel(state.mafiaTarget) + " " + t("savedAnnouncement")));
     } else if (outcome.disagreement) {
       body.appendChild(text("h2", "", t("mafiaDisagreedAnnouncement")));
     } else {
@@ -1057,6 +1059,9 @@
         render();
       }
     }, [document.createTextNode(state.confirmReveal ? t("tapAgainReveal") : t("revealResults"))]));
+    if (state.confirmReveal) {
+      body.appendChild(text("p", "", t("revealConfirmHint")));
+    }
     return body;
   }
 

@@ -17,6 +17,10 @@
   // like sideways movement was broken, especially when sidestepping a tree.)
   const EDGE_ZONE_FRACTION = 1 / 3;
   const EDGE_ZONE_MIN = 90, EDGE_ZONE_MAX = 220; // px clamp so it stays sane on tiny/huge screens
+  // Max pointer travel (px) for a gesture to still count as a tap rather than
+  // a swipe -- shared by the canvas and the ready overlay so an exploratory
+  // swipe doesn't accidentally dismiss the instructions as a "tap to start".
+  const TAP_MAX_TRAVEL = 28;
   const BEST_SCORE_KEY = 'crossyroad.bestScore';
   const CAR_COLORS = ['#e0473f', '#3b82f6', '#f2994a', '#f2d84a', '#9b5de5'];
 
@@ -54,7 +58,6 @@
 
       this.setupInput();
       document.getElementById('restart-btn').addEventListener('click', () => this.startNewGame());
-      this.readyOverlay.addEventListener('click', () => this.startPlaying());
 
       this.startNewGame();
       requestAnimationFrame((t) => this.loop(t));
@@ -80,7 +83,6 @@
 
     setupInput() {
       let tracking = false, startX = 0, startY = 0;
-      const SWIPE_THRESHOLD = 28;
 
       this.canvas.addEventListener('pointerdown', (e) => {
         tracking = true;
@@ -93,7 +95,7 @@
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         const adx = Math.abs(dx), ady = Math.abs(dy);
-        if (adx < SWIPE_THRESHOLD && ady < SWIPE_THRESHOLD) {
+        if (adx < TAP_MAX_TRAVEL && ady < TAP_MAX_TRAVEL) {
           this.handleTapAt(e.clientX);
         } else if (ady > adx) {
           if (dy < 0) this.attemptMove(0, 1); // swipe up; swipe down is ignored (no backward move)
@@ -102,6 +104,26 @@
         }
       });
       this.canvas.addEventListener('pointercancel', () => { tracking = false; });
+
+      // The ready overlay only starts the game on a genuine tap. A plain
+      // 'click' listener would also fire after a drag that lifts over the
+      // same element -- meaning a player's very first exploratory swipe
+      // (testing what the controls do) would silently start the game
+      // before they'd finished reading the instructions.
+      let readyTracking = false, readyStartX = 0, readyStartY = 0;
+      this.readyOverlay.addEventListener('pointerdown', (e) => {
+        readyTracking = true;
+        readyStartX = e.clientX;
+        readyStartY = e.clientY;
+      });
+      this.readyOverlay.addEventListener('pointerup', (e) => {
+        if (!readyTracking) return;
+        readyTracking = false;
+        const adx = Math.abs(e.clientX - readyStartX);
+        const ady = Math.abs(e.clientY - readyStartY);
+        if (adx < TAP_MAX_TRAVEL && ady < TAP_MAX_TRAVEL) this.startPlaying();
+      });
+      this.readyOverlay.addEventListener('pointercancel', () => { readyTracking = false; });
 
       window.addEventListener('keydown', (e) => {
         switch (e.key) {
@@ -409,21 +431,37 @@
       if (this.state === 'playing') this.drawEdgeHints();
     }
 
-    // Faint chevrons marking the tap-to-strafe zones (centered in each zone).
+    // Chevrons marking the tap-to-strafe zones (centered in each zone). Each
+    // sits on its own translucent dark pill so it stays legible regardless
+    // of which lane color happens to be scrolling underneath -- a plain
+    // low-alpha glyph directly on the world was unreadable over grass/water.
     drawEdgeHints() {
       const ctx = this.ctx;
       const edge = this.edgeZoneWidth();
       const midY = this.height * 0.5;
       const fontSize = Math.min(40, Math.max(26, edge * 0.22));
-      ctx.save();
-      ctx.globalAlpha = 0.16;
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `${Math.round(fontSize)}px -apple-system, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('‹', edge * 0.5, midY);
-      ctx.fillText('›', this.width - edge * 0.5, midY);
-      ctx.restore();
+      const pillRadius = fontSize * 0.66;
+
+      const drawHint = (x, glyph) => {
+        ctx.save();
+        ctx.globalAlpha = 0.72;
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(x, midY, pillRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `${Math.round(fontSize)}px -apple-system, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(glyph, x, midY);
+        ctx.restore();
+      };
+
+      drawHint(edge * 0.5, '‹');
+      drawHint(this.width - edge * 0.5, '›');
     }
 
     drawLane(lane) {

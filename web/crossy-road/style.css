@@ -108,3 +108,47 @@ html, body {
 .btn:active {
   transform: scale(0.96);
 }
+
+/* A phone (not a tablet/desktop) turned sideways: web pages can't lock
+   orientation the way a native app can, so this covers the game and blocks
+   input until it's rotated back, rather than rendering a badly cramped
+   view with no explanation. */
+#rotate-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #14181c;
+  color: #fff;
+  text-align: center;
+  padding: 0 40px;
+}
+
+#rotate-overlay p {
+  margin: 0;
+  max-width: 32ch;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.rotate-icon {
+  font-size: 48px;
+  animation: rotate-hint 1.6s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotate-icon { animation: none; transform: rotate(-90deg); }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #rotate-overlay { display: flex; }
+}

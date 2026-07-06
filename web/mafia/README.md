@@ -33,7 +33,10 @@ a loop of three stages on one shared device:
    Doctor protected them). If they don't all agree, the device announces
    it and every player — Mafia included — passes through the night once
    more to try again. A second round with no agreement means no one is
-   attacked that night.
+   attacked that night. With a single Mafia (the default setup), all of
+   this is moot — the copy says so outright ("you're the only Mafia, so
+   your pick is final") instead of talking about teammates that don't
+   exist.
 3. **Day** — the device announces who died (if anyone) and their role,
    then the group discusses out loud. Pass the device once more for a
    secret vote: each living player picks who to eliminate. A tap-to-hold

@@ -24,15 +24,12 @@
   <div id="start-overlay" class="overlay">
     <div class="panel">
       <h1>1V1 SOCCER</h1>
-      <p>First to score more goals in 90 seconds wins.</p>
-      <p>Move, jump into the ball, and kick it past the keeper.</p>
-      <div class="mode-buttons">
-        <button id="mode-1p" class="btn">1 PLAYER<span>vs CPU</span></button>
-        <button id="mode-2p" class="btn btn-alt">2 PLAYERS<span>same keyboard</span></button>
-      </div>
+      <p>Score more goals than the CPU in 90 seconds.</p>
+      <p>Move, jump into the ball, and kick it into the net.</p>
+      <button id="start-btn" class="btn">PLAY</button>
       <div class="controls-help">
-        <div><strong>P1</strong> A/D move · W jump · S kick</div>
-        <div><strong>P2</strong> ←/→ move · ↑ jump · ↓ kick</div>
+        <div><strong>Keyboard</strong> A/D or ←/→ move · W/↑ jump · S/↓/Space kick</div>
+        <div><strong>Touch</strong> left thumb moves · right thumb jumps &amp; kicks</div>
       </div>
     </div>
   </div>
@@ -48,21 +45,13 @@
   </div>
 
   <div class="touch-controls">
-    <div id="p1-controls" class="pad pad-left">
-      <div class="pad-row">
-        <button class="pad-btn" data-action="p1-left">◀</button>
-        <button class="pad-btn" data-action="p1-jump">▲</button>
-        <button class="pad-btn" data-action="p1-right">▶</button>
-      </div>
-      <button class="pad-btn kick-btn" data-action="p1-kick">KICK</button>
+    <div class="pad pad-left">
+      <button class="pad-btn move-btn" data-action="p1-left">◀</button>
+      <button class="pad-btn move-btn" data-action="p1-right">▶</button>
     </div>
-    <div id="p2-controls" class="pad pad-right hidden">
-      <div class="pad-row">
-        <button class="pad-btn" data-action="p2-left">◀</button>
-        <button class="pad-btn" data-action="p2-jump">▲</button>
-        <button class="pad-btn" data-action="p2-right">▶</button>
-      </div>
-      <button class="pad-btn kick-btn" data-action="p2-kick">KICK</button>
+    <div class="pad pad-right">
+      <button class="pad-btn jump-btn" data-action="p1-jump">▲<span>JUMP</span></button>
+      <button class="pad-btn kick-btn" data-action="p1-kick">⚽<span>KICK</span></button>
     </div>
   </div>
 

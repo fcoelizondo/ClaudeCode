@@ -1,20 +1,27 @@
 # 1v1 Soccer
 
-A side-view, physics-based head soccer game — 1 player vs CPU, or 2
-players on the same keyboard. Plain HTML5 Canvas + JS, no build step, no
-dependencies — open `index.html` directly or serve the folder.
+A side-view, physics-based head soccer game — 1 player vs a CPU
+opponent. Plain HTML5 Canvas + JS, no build step, no dependencies — open
+`index.html` directly or serve the folder.
 
-Score more goals than your opponent before the 90-second clock runs out.
-Bump the ball with any part of your player for a soft touch, or press
-kick for a hard, aimed shot.
+Score more goals than the CPU before the 90-second clock runs out. Bump
+the ball with any part of your player for a soft touch, or press kick
+for a hard shot aimed at the opponent's goal — jump kicks get extra
+lift. Shots can rattle off the crossbar, and the CPU rubber-bands its
+speed to keep matches close.
+
+Includes a full stadium backdrop (crowd, floodlights, ad boards),
+animated players with run cycles and squash-and-stretch, goal confetti,
+screen shake, a ball motion trail, and synthesized sound effects (no
+audio assets).
 
 ## Controls
 
-- **Player 1** — `A`/`D` to move, `W` to jump, `S` (or `Space`) to kick.
-- **Player 2** (2-player mode) — arrow keys to move, `↑` to jump, `↓` to
-  kick.
-- Touch devices get on-screen move/jump/kick pads instead (bottom-left
-  for Player 1, bottom-right for Player 2 in 2-player mode).
+- **Move** — `A`/`D` or `←`/`→`.
+- **Jump** — `W` or `↑`.
+- **Kick** — `S`, `↓`, or `Space`.
+- Touch devices get on-screen controls instead: a left-thumb pad to move
+  left/right, and a right-thumb pad for jump and kick.
 - This is a landscape game; portrait phones get a rotate prompt.
 
 ## Files

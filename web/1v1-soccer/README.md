@@ -1,4 +1,4 @@
-# Head Strikers
+# 1v1 Soccer
 
 A side-view, physics-based head soccer game — 1 player vs CPU, or 2
 players on the same keyboard. Plain HTML5 Canvas + JS, no build step, no

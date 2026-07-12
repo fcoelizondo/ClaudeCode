@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Sky Roo</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sky Roo">
+<meta name="theme-color" content="#7ec8f2">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="score">0</div>
+    <div id="best">BEST 0</div>
+  </div>
+
+  <div id="ready-overlay" class="overlay">
+    <div class="panel">
+      <h1>SKY ROO</h1>
+      <p>Drag, or press ← / A and → / D, to steer</p>
+      <p>Roo bounces on her own — just don't fall off the bottom</p>
+      <p>Grab balloons for a boost, watch out for crows</p>
+      <button id="start-btn" class="btn">TAP TO PLAY</button>
+    </div>
+  </div>
+
+  <div id="gameover-overlay" class="overlay hidden">
+    <div class="panel">
+      <h1>GAME OVER</h1>
+      <p id="final-score">Score: 0</p>
+      <p id="final-best">Best: 0</p>
+      <button id="restart-btn" class="btn">TAP TO RESTART</button>
+    </div>
+  </div>
+
+  <div id="rotate-overlay">
+    <div class="rotate-icon">📱</div>
+    <p>Rotate your device to play — Sky Roo is a portrait game.</p>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

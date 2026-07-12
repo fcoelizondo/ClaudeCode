@@ -89,14 +89,16 @@
 
     setupInput() {
       this.inputDir = 0;
-      this.pointerDown = false;
+      this.keyDir = 0;
+      this.tiltDir = 0;
+      this.tiltBaseline = null;
+      this.tiltPermissionRequested = false;
       const keys = new Set();
 
       const updateFromKeys = () => {
         let d = 0;
         if (keys.has('ArrowLeft') || keys.has('a') || keys.has('A')) d -= 1;
         if (keys.has('ArrowRight') || keys.has('d') || keys.has('D')) d += 1;
-        if (!this.pointerDown) this.inputDir = d;
         this.keyDir = d;
       };
 
@@ -113,25 +115,40 @@
         updateFromKeys();
       });
 
-      this.canvas.addEventListener('pointerdown', (e) => {
-        this.pointerDown = true;
-        this.inputDir = e.clientX < this.width / 2 ? -1 : 1;
-      });
-      this.canvas.addEventListener('pointermove', (e) => {
-        if (!this.pointerDown) return;
-        this.inputDir = e.clientX < this.width / 2 ? -1 : 1;
-      });
-      const releasePointer = () => {
-        this.pointerDown = false;
-        this.inputDir = this.keyDir || 0;
+      // Steering comes from tilting the device left/right (event.gamma).
+      // Neutral ("flat") is recalibrated to however the player is actually
+      // holding the phone at the moment each run starts, so there's no need
+      // to hold it dead level -- only the delta from that pose matters.
+      const TILT_DEAD_ZONE = 3, TILT_MAX = 18;
+      const handleOrientation = (e) => {
+        if (e.gamma === null || e.gamma === undefined) return;
+        if (this.tiltBaseline === null) this.tiltBaseline = e.gamma;
+        const delta = e.gamma - this.tiltBaseline;
+        const mag = clamp((Math.abs(delta) - TILT_DEAD_ZONE) / (TILT_MAX - TILT_DEAD_ZONE), 0, 1);
+        this.tiltDir = mag * Math.sign(delta);
       };
-      this.canvas.addEventListener('pointerup', releasePointer);
-      this.canvas.addEventListener('pointercancel', releasePointer);
+
+      // iOS 13+ requires a permission prompt fired from a user gesture; other
+      // browsers expose deviceorientation without asking. Either way this is
+      // called from the ready-overlay tap, which is a genuine user gesture.
+      this.enableTilt = () => {
+        if (this.tiltPermissionRequested) return;
+        this.tiltPermissionRequested = true;
+        const DOE = window.DeviceOrientationEvent;
+        if (!DOE) return;
+        if (typeof DOE.requestPermission === 'function') {
+          DOE.requestPermission()
+            .then((state) => { if (state === 'granted') window.addEventListener('deviceorientation', handleOrientation); })
+            .catch(() => {});
+        } else {
+          window.addEventListener('deviceorientation', handleOrientation);
+        }
+      };
 
       let readyTracking = false;
       this.readyOverlay.addEventListener('pointerdown', () => { readyTracking = true; });
       this.readyOverlay.addEventListener('pointerup', () => {
-        if (readyTracking) this.startPlaying();
+        if (readyTracking) { this.enableTilt(); this.startPlaying(); }
         readyTracking = false;
       });
     }
@@ -222,6 +239,7 @@
       this.state = 'playing';
       this.readyOverlay.classList.add('hidden');
       this.player.vy = JUMP_VELOCITY * 0.6;
+      this.tiltBaseline = null; // recalibrate neutral tilt to however the phone is held right now
     }
 
     triggerGameOver() {
@@ -266,10 +284,12 @@
     update(dt) {
       const p = this.player;
 
-      // Horizontal steering, with screen wrap-around.
+      // Horizontal steering: tilt drives it on devices with an orientation
+      // sensor, arrow keys/AD on desktop, with screen wrap-around.
+      this.inputDir = clamp(this.keyDir + this.tiltDir, -1, 1);
       const targetVx = this.inputDir * MAX_VX;
       p.vx = lerp(p.vx, targetVx, clamp01(dt * STEER_LERP));
-      if (this.inputDir !== 0) p.facing = this.inputDir;
+      if (Math.abs(this.inputDir) > 0.05) p.facing = this.inputDir > 0 ? 1 : -1;
       p.x += p.vx * dt;
       if (p.x < -PLAYER_HALF_W) p.x = this.width + PLAYER_HALF_W;
       if (p.x > this.width + PLAYER_HALF_W) p.x = -PLAYER_HALF_W;

@@ -2,9 +2,21 @@
 
 A side-view, physics-based head soccer game — 1 player vs a CPU
 opponent with three selectable difficulty levels (easy/medium/hard vary
-the CPU's speed, reaction cooldowns, and anticipation). Plain HTML5
-Canvas + JS, no build step, no dependencies — open `index.html` directly
-or serve the folder.
+the CPU's speed, kick power, reaction cooldowns, and anticipation).
+Plain HTML5 Canvas + JS, no build step, no dependencies — open
+`index.html` directly or serve the folder.
+
+## Characters & achievements
+
+Six playable characters, each with different stats (move speed, jump
+height, kick power, shot angle, body size) and a distinct look. Only
+LEO starts unlocked; the rest unlock through lifetime achievements
+tracked in `localStorage` (play 10 matches, score 25 goals, score 10
+header goals, win 10 matches). The legendary RAYO (100 goals scored)
+has a special chip shot: a golden ballistic lob solved from the
+distance to goal, arcing over even a jumping defender. Progress and
+selection persist between visits; unlocks are announced on the
+full-time screen.
 
 Score more goals than the CPU before the 90-second clock runs out. Bump
 the ball with any part of your player for a soft touch, or press kick

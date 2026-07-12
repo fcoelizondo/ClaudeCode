@@ -20,7 +20,6 @@
   const JUMP_V = -780;
   const GROUND_BOUNCE = 0.72;
   const WALL_BOUNCE = 0.68;
-  const KICK_RANGE = PLAYER_R + BALL_R + 18;
   const KICK_POWER = 920;
   // Lift tuned so a midrange shot crosses the goal line roughly at
   // jump-block height: the defender can save it by timing a jump.
@@ -42,6 +41,55 @@
     medium: { speed: 0.90, kickCd: 0.60, jumpCd: 0.60, lead: 0.22, kickoffWait: 0.55, power: 0.90, reaction: 0.18 },
     hard:   { speed: 1.02, kickCd: 0.40, jumpCd: 0.45, lead: 0.30, kickoffWait: 0.25, power: 1.0,  reaction: 0.06 },
   };
+
+  // ---- Roster & achievements ----
+  // Stat fields are multipliers on the base constants; `unlock` names a
+  // lifetime-stat threshold that reveals the character (null = free).
+  const CHARACTERS = [
+    { id: 'leo', name: 'LEO', desc: 'Balanced all-rounder',
+      jersey: '#3fa7ff', accent: '#1c5f96', skin: '#f2b98a', hair: 'band',
+      r: 1.0, speed: 1.0, jump: 1.0, power: 1.0, lift: 1.0, special: null, unlock: null },
+    { id: 'turbo', name: 'TURBO', desc: 'Blazing speed, soft kick',
+      jersey: '#ff9330', accent: '#a35208', skin: '#c98d5e', hair: 'cap',
+      r: 0.95, speed: 1.25, jump: 1.0, power: 0.85, lift: 1.0, special: null,
+      unlock: { stat: 'games', n: 10, label: 'Play 10 matches' } },
+    { id: 'tanque', name: 'TANQUE', desc: 'Cannon kick, big and slow',
+      jersey: '#8d2f2f', accent: '#521b1b', skin: '#f2b98a', hair: 'buzz',
+      r: 1.12, speed: 0.85, jump: 0.9, power: 1.3, lift: 0.85, special: null,
+      unlock: { stat: 'goals', n: 25, label: 'Score 25 goals' } },
+    { id: 'grillo', name: 'GRILLO', desc: 'Sky-high jumper',
+      jersey: '#39b06a', accent: '#166437', skin: '#8a5a3b', hair: 'mohawk',
+      r: 0.9, speed: 1.05, jump: 1.35, power: 0.9, lift: 1.15, special: null,
+      unlock: { stat: 'headers', n: 10, label: 'Score 10 header goals' } },
+    { id: 'mago', name: 'MAGO', desc: 'Laser-flat line drives',
+      jersey: '#8a55d6', accent: '#4d2b85', skin: '#f2b98a', hair: 'afro',
+      r: 1.0, speed: 0.95, jump: 1.05, power: 1.05, lift: 0.7, special: null,
+      unlock: { stat: 'wins', n: 10, label: 'Win 10 matches' } },
+    { id: 'rayo', name: 'RAYO', desc: 'Legendary chip shot sails over anyone',
+      jersey: '#e8b923', accent: '#8f6a06', skin: '#f2b98a', hair: 'star',
+      r: 1.0, speed: 1.1, jump: 1.1, power: 1.1, lift: 1.0, special: 'chip',
+      unlock: { stat: 'goals', n: 100, label: 'Score 100 goals' } },
+  ];
+  const CPU_CHAR = {
+    id: 'cpu', name: 'CPU', jersey: '#ff6b6b', accent: '#9e3535', skin: '#f2b98a', hair: 'band',
+    r: 1.0, speed: 1.0, jump: 1.0, power: 1.0, lift: 1.0, special: null,
+  };
+
+  const STATS_KEY = '1v1soccer.stats';
+  const CHAR_KEY = '1v1soccer.character';
+  const STAT_ICONS = { goals: '⚽', headers: '🤕', games: '🎮', wins: '🏆' };
+
+  function loadStats() {
+    const base = { goals: 0, headers: 0, games: 0, wins: 0 };
+    try { return Object.assign(base, JSON.parse(localStorage.getItem(STATS_KEY)) || {}); }
+    catch { return base; }
+  }
+  function saveStats(s) {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch { /* private mode */ }
+  }
+  function isUnlocked(ch, stats) {
+    return !ch.unlock || stats[ch.unlock.stat] >= ch.unlock.n;
+  }
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const damp = (value, factor, dt) => value * Math.pow(factor, dt * 60);
@@ -106,15 +154,27 @@
   }
 
   class Player {
-    constructor(side, color, accent) {
+    constructor(side, chr) {
       this.side = side; // 'left' | 'right'
-      this.color = color;
-      this.accent = accent; // headband / trim color
+      this.setCharacter(chr);
       this.reset();
+    }
+    setCharacter(c) {
+      this.chr = c;
+      this.color = c.jersey;
+      this.accent = c.accent;
+      this.skin = c.skin;
+      this.hair = c.hair;
+      this.r = PLAYER_R * c.r;
+      this.speedMul = c.speed;
+      this.jumpMul = c.jump;
+      this.powerMul = c.power;
+      this.liftMul = c.lift;
+      this.special = c.special;
     }
     reset() {
       this.x = this.side === 'left' ? WIDTH * 0.25 : WIDTH * 0.75;
-      this.y = GROUND_Y - PLAYER_R;
+      this.y = GROUND_Y - this.r;
       this.vx = 0;
       this.vy = 0;
       this.onGround = true;
@@ -130,7 +190,7 @@
     }
     jump() {
       if (this.onGround) {
-        this.vy = JUMP_V;
+        this.vy = JUMP_V * this.jumpMul;
         this.onGround = false;
         this.stretch = 1.16;
       }
@@ -155,9 +215,13 @@
       this.fulltimeTitle = document.getElementById('fulltime-title');
       this.fulltimeScore = document.getElementById('fulltime-score');
       this.goalBanner = document.getElementById('goal-banner');
+      this.unlockNote = document.getElementById('unlock-note');
 
-      this.p1 = new Player('left', '#3fa7ff', '#1c5f96');
-      this.p2 = new Player('right', '#ff6b6b', '#9e3535');
+      this.stats = loadStats();
+      let chr = CHARACTERS.find((c) => c.id === localStorage.getItem(CHAR_KEY)) || CHARACTERS[0];
+      if (!isUnlocked(chr, this.stats)) chr = CHARACTERS[0];
+      this.p1 = new Player('left', chr);
+      this.p2 = new Player('right', CPU_CHAR);
       this.ball = { x: WIDTH / 2, y: GROUND_Y - BALL_R - 120, vx: 0, vy: 0, spin: 0 };
 
       this.scoreLeft = 0;
@@ -176,6 +240,7 @@
 
       this.difficulty = DIFFICULTIES.medium;
       this.setupInput();
+      this.buildRoster();
       for (const key of Object.keys(DIFFICULTIES)) {
         document.getElementById(`diff-${key}`).addEventListener('click', () => {
           this.difficulty = DIFFICULTIES[key];
@@ -185,6 +250,7 @@
       document.getElementById('restart-btn').addEventListener('click', () => this.startMatch());
       document.getElementById('menu-btn').addEventListener('click', () => {
         this.fulltimeOverlay.classList.add('hidden');
+        this.buildRoster();
         this.startOverlay.classList.remove('hidden');
         this.state = 'start';
       });
@@ -250,10 +316,161 @@
       bind('p1-kick', () => active() && this.p1.kick());
     }
 
+    // ---- Roster UI ----
+
+    buildRoster() {
+      const el = document.getElementById('roster');
+      el.innerHTML = '';
+      for (const c of CHARACTERS) {
+        const unlocked = isUnlocked(c, this.stats);
+        const card = document.createElement('div');
+        card.className = 'char-card' +
+          (unlocked ? '' : ' locked') +
+          (this.p1.chr.id === c.id ? ' selected' : '');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 96;
+        canvas.height = 96;
+        canvas.className = 'char-portrait';
+        this.drawPortrait(canvas, c, unlocked);
+        card.appendChild(canvas);
+
+        const name = document.createElement('div');
+        name.className = 'char-name';
+        name.textContent = c.name;
+        card.appendChild(name);
+
+        const sub = document.createElement('div');
+        sub.className = 'char-sub';
+        if (unlocked) {
+          sub.textContent = c.desc;
+        } else {
+          const u = c.unlock;
+          sub.textContent = `🔒 ${u.label} (${Math.min(this.stats[u.stat], u.n)}/${u.n})`;
+        }
+        card.appendChild(sub);
+
+        if (unlocked) {
+          card.addEventListener('click', () => {
+            this.p1.setCharacter(c);
+            this.p1.reset();
+            try { localStorage.setItem(CHAR_KEY, c.id); } catch { /* private mode */ }
+            this.buildRoster();
+          });
+        }
+        el.appendChild(card);
+      }
+      const totals = document.getElementById('stats-line');
+      totals.textContent = Object.entries(STAT_ICONS)
+        .map(([k, icon]) => `${icon} ${this.stats[k]}`).join('   ');
+    }
+
+    drawPortrait(canvas, c, unlocked) {
+      const g = canvas.getContext('2d');
+      g.scale(2, 2); // canvas is 2x for crisp rendering at 48px CSS size
+      const cx = 24, cy = 20, r = 13;
+      if (!unlocked) g.filter = 'grayscale(1) brightness(0.7)';
+      // jersey
+      g.fillStyle = c.jersey;
+      roundRectPath(g, cx - 11, cy + 10, 22, 16, 6);
+      g.fill();
+      g.fillStyle = 'rgba(255,255,255,0.35)';
+      g.fillRect(cx - 9, cy + 16, 18, 2.5);
+      // hair behind the head
+      this.drawHairBack(g, cx, cy, r, c);
+      // head
+      g.fillStyle = c.skin;
+      g.beginPath();
+      g.arc(cx, cy, r, 0, Math.PI * 2);
+      g.fill();
+      g.strokeStyle = 'rgba(0,0,0,0.15)';
+      g.lineWidth = 1.5;
+      g.stroke();
+      // hair in front
+      this.drawHairFront(g, cx, cy, r, c, 1);
+      // face
+      g.fillStyle = '#1a1a1a';
+      g.beginPath();
+      g.arc(cx + 4.5, cy - 1.5, 1.6, 0, Math.PI * 2);
+      g.fill();
+      g.strokeStyle = '#1a1a1a';
+      g.lineWidth = 1.4;
+      g.beginPath();
+      g.arc(cx + 4, cy + 3.5, 2.6, 0.2, 1.2);
+      g.stroke();
+    }
+
+    // Afro renders behind the head; everything else on top of it.
+    drawHairBack(ctx, x, y, r, c) {
+      if (c.hair === 'afro') {
+        ctx.fillStyle = '#33241a';
+        ctx.beginPath();
+        ctx.arc(x, y - r * 0.35, r * 1.18, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    drawHairFront(ctx, x, y, r, c, facing) {
+      ctx.save();
+      if (c.hair === 'band') {
+        ctx.strokeStyle = c.accent;
+        ctx.lineWidth = r * 0.32;
+        ctx.beginPath();
+        ctx.arc(x, y, r - r * 0.1, Math.PI * 1.12, Math.PI * 1.88);
+        ctx.stroke();
+      } else if (c.hair === 'cap') {
+        ctx.fillStyle = c.accent;
+        ctx.beginPath();
+        ctx.arc(x, y - r * 0.12, r, Math.PI, Math.PI * 2);
+        ctx.fill();
+        roundRectPath(ctx, facing > 0 ? x : x - r * 1.5, y - r * 0.3, r * 1.5, r * 0.3, r * 0.12);
+        ctx.fill();
+      } else if (c.hair === 'mohawk') {
+        ctx.fillStyle = c.accent;
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(x + i * r * 0.4 - r * 0.18, y - r * 0.82);
+          ctx.lineTo(x + i * r * 0.4, y - r * 1.5 + Math.abs(i) * r * 0.22);
+          ctx.lineTo(x + i * r * 0.4 + r * 0.18, y - r * 0.82);
+          ctx.closePath();
+          ctx.fill();
+        }
+      } else if (c.hair === 'buzz') {
+        ctx.fillStyle = 'rgba(30,25,20,0.85)';
+        ctx.beginPath();
+        ctx.arc(x, y, r - 0.5, Math.PI * 1.15, Math.PI * 1.85);
+        ctx.lineTo(x + r * 0.55, y - r * 0.62);
+        ctx.closePath();
+        ctx.fill();
+      } else if (c.hair === 'star') {
+        ctx.strokeStyle = c.accent;
+        ctx.lineWidth = r * 0.32;
+        ctx.beginPath();
+        ctx.arc(x, y, r - r * 0.1, Math.PI * 1.12, Math.PI * 1.88);
+        ctx.stroke();
+        ctx.fillStyle = '#ffd23f';
+        const sy = y - r * 1.35, sr = r * 0.42;
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + (Math.PI * i) / 5;
+          const rr = i % 2 === 0 ? sr : sr * 0.45;
+          const px = x + Math.cos(a) * rr;
+          const py = sy + Math.sin(a) * rr;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
     startMatch() {
       this.scoreLeft = 0;
       this.scoreRight = 0;
       this.timeLeft = MATCH_TIME;
+      this.unlockedAtStart = new Set(CHARACTERS.filter((c) => isUnlocked(c, this.stats)).map((c) => c.id));
+      this.lastTouch = null;
       this.updateScoreHud();
       this.resetPositions();
       this.state = 'playing';
@@ -271,6 +488,7 @@
       this.ball.vy = 0;
       this.ball.spin = 0;
       this.fx.trail.length = 0;
+      this.fx.golden = false;
       this.p1.reset();
       this.p2.reset();
       // Kickoff fairness: the CPU has frame-perfect reactions, so give it
@@ -354,7 +572,9 @@
     // accelerate, with friction when no direction is held.
     steer(p, dir, dt, maxSpeed = MOVE_SPEED) {
       if (dir !== 0) {
-        const accel = p.onGround ? MOVE_ACCEL : AIR_ACCEL;
+        // Scale acceleration with top speed so fast characters also feel
+        // quicker off the mark, not just at full sprint.
+        const accel = (p.onGround ? MOVE_ACCEL : AIR_ACCEL) * (maxSpeed / MOVE_SPEED);
         p.vx = clamp(p.vx + dir * accel * dt, -maxSpeed, maxSpeed);
         p.facing = dir > 0 ? 1 : -1;
       } else {
@@ -367,7 +587,7 @@
       let dir = 0;
       if (this.keys['KeyA'] || this.keys['ArrowLeft'] || this.keys['p1-left']) dir -= 1;
       if (this.keys['KeyD'] || this.keys['ArrowRight'] || this.keys['p1-right']) dir += 1;
-      this.steer(this.p1, dir, dt);
+      this.steer(this.p1, dir, dt, MOVE_SPEED * this.p1.speedMul);
     }
 
     updateAI(dt) {
@@ -415,10 +635,11 @@
       // The CPU kicks on a slower cadence than a human can, and only
       // after its reaction time has elapsed with the ball in reach — no
       // instant volleys on arriving balls.
+      const aiKickRange = ai.r + BALL_R + 18;
       const distToBall = Math.hypot(ball.x - ai.x, ball.y - ai.y);
-      if (distToBall < KICK_RANGE + 30) ai.aiBallNear += dt;
+      if (distToBall < aiKickRange + 30) ai.aiBallNear += dt;
       else ai.aiBallNear = 0;
-      if (distToBall < KICK_RANGE - 4 && ai.aiKickCd === 0 && ai.aiBallNear >= d.reaction) {
+      if (distToBall < aiKickRange - 4 && ai.aiKickCd === 0 && ai.aiBallNear >= d.reaction) {
         ai.kick();
         ai.aiKickCd = d.kickCd;
       }
@@ -433,8 +654,8 @@
       const wasAirborne = !p.onGround;
       p.vy += GRAVITY * dt;
       p.y += p.vy * dt;
-      if (p.y >= GROUND_Y - PLAYER_R) {
-        p.y = GROUND_Y - PLAYER_R;
+      if (p.y >= GROUND_Y - p.r) {
+        p.y = GROUND_Y - p.r;
         if (wasAirborne && p.vy > 300) {
           p.stretch = 0.85;
           this.spawnDust(p.x, GROUND_Y, 6);
@@ -453,7 +674,7 @@
 
     resolvePlayerCollision() {
       const a = this.p1, b = this.p2;
-      const minDist = PLAYER_R * 1.7;
+      const minDist = (a.r + b.r) * 0.85;
       const dx = b.x - a.x;
       const dist = Math.abs(dx) || 0.001;
       if (dist < minDist) {
@@ -561,11 +782,11 @@
       const dx = b.x - p.x;
       const dy = b.y - p.y;
       const dist = Math.hypot(dx, dy) || 0.001;
-      const bodyDist = PLAYER_R + BALL_R;
+      const bodyDist = p.r + BALL_R;
       const kicking = p.kickTimer > 0;
       // A kick reaches further than a plain header/body bump, matching the
       // outstretched leg drawn in drawPlayer().
-      const range = kicking ? KICK_RANGE : bodyDist;
+      const range = kicking ? p.r + BALL_R + 18 : bodyDist;
 
       if (dist >= range) {
         if (!kicking) p.kickApplied = false;
@@ -580,33 +801,65 @@
 
       if (kicking) {
         if (!p.kickApplied) {
-          // Kicks are aimed: mostly toward the opponent's goal, with some
-          // contact-angle influence, and extra lift on jump kicks. The CPU
-          // kicks at its difficulty's power; weaker CPUs can't shoot from
-          // as far out.
-          const dirSign = p === this.p1 ? 1 : -1;
-          const pow = KICK_POWER * (p === this.p2 ? this.difficulty.power : 1);
-          const lift = (p.onGround ? KICK_LIFT : KICK_LIFT * 1.2) * (p === this.p2 ? this.difficulty.power : 1);
-          b.vx = dirSign * pow * 0.72 + nx * pow * 0.28 + p.vx * 0.35;
-          // Small contact-angle influence only: a ball on the ground has a
-          // downward-pointing normal that would otherwise flatten the arc.
-          b.vy = lift + ny * pow * 0.18;
+          const isCpu = p === this.p2;
+          const dirSign = isCpu ? -1 : 1;
+          this.fx.golden = false;
+          if (!isCpu && p.special === 'chip') {
+            // Legendary chip: a ballistic lob whose peak clears even a
+            // jumping defender, dropping back down into the goal mouth.
+            // Speed is solved from the distance so it lands on target;
+            // a defender parked on the goal line can still get lucky.
+            const distToGoal = Math.max(140, GOAL_LINE_RIGHT - b.x);
+            const peak = 250;
+            const vyUp = Math.sqrt(2 * GRAVITY * peak);
+            const flight = vyUp / GRAVITY + Math.sqrt((2 * (peak - 50)) / GRAVITY);
+            // ~0.7 compensates for horizontal air drag over the flight
+            b.vx = clamp(distToGoal / (flight * 0.7), 320, 1330);
+            b.vy = -vyUp;
+            this.fx.golden = true;
+            this.spawnSpark(b.x, b.y);
+            this.addShake(7);
+            this.sfx.kick();
+            this.sfx.tone(880, 0.25, { type: 'triangle', gain: 0.09 });
+          } else {
+            // Kicks are aimed: mostly toward the opponent's goal, with
+            // some contact-angle influence, and extra lift on jump kicks.
+            // The CPU kicks at its difficulty's power; the player kicks
+            // at their character's power and shot angle.
+            const pow = KICK_POWER * (isCpu ? this.difficulty.power : p.powerMul);
+            const lift = (p.onGround ? KICK_LIFT : KICK_LIFT * 1.2) *
+              (isCpu ? this.difficulty.power : p.liftMul);
+            b.vx = dirSign * pow * 0.72 + nx * pow * 0.28 + p.vx * 0.35;
+            // Small contact-angle influence only: a ball on the ground has
+            // a downward-pointing normal that would otherwise flatten the arc.
+            b.vy = lift + ny * pow * 0.18;
+            this.spawnSpark(b.x, b.y);
+            this.addShake(4);
+            this.sfx.kick();
+          }
           p.kickApplied = true;
-          this.spawnSpark(b.x, b.y);
-          this.addShake(4);
-          this.sfx.kick();
+          this.lastTouch = { p, kick: true };
         }
       } else {
         const relSpeed = Math.hypot(p.vx, p.vy);
         const power = Math.max(BUMP_POWER * 0.4, relSpeed * 1.1);
         b.vx = nx * power + p.vx * 0.5;
         b.vy = ny * power - 60;
+        this.fx.golden = false;
+        this.lastTouch = { p, kick: false };
       }
     }
 
     scoreGoal(scoringSide) {
       if (scoringSide === 'left') this.scoreLeft++;
       else this.scoreRight++;
+      // Achievements: count goals where the player had the last touch;
+      // a touch that wasn't a kick counts as a header.
+      if (scoringSide === 'left' && this.lastTouch && this.lastTouch.p === this.p1) {
+        this.stats.goals++;
+        if (!this.lastTouch.kick) this.stats.headers++;
+        saveStats(this.stats);
+      }
       this.updateScoreHud();
       this.state = 'goal';
       this.celebrateTimer = GOAL_CELEBRATE_TIME;
@@ -627,6 +880,22 @@
       else if (this.scoreRight > this.scoreLeft) title = 'CPU WINS';
       this.fulltimeTitle.textContent = title;
       this.fulltimeScore.textContent = `${this.scoreLeft} - ${this.scoreRight}`;
+
+      this.stats.games++;
+      if (this.scoreLeft > this.scoreRight) this.stats.wins++;
+      saveStats(this.stats);
+
+      // Surface any characters this match's stats just unlocked.
+      const fresh = CHARACTERS.filter(
+        (c) => isUnlocked(c, this.stats) && !this.unlockedAtStart.has(c.id));
+      if (fresh.length) {
+        this.unlockNote.textContent = '🔓 UNLOCKED: ' + fresh.map((c) => c.name).join(' · ');
+        this.unlockNote.classList.remove('hidden');
+        this.sfx.goal();
+      } else {
+        this.unlockNote.classList.add('hidden');
+      }
+
       this.fulltimeOverlay.classList.remove('hidden');
       this.sfx.whistle(3);
     }
@@ -872,23 +1141,24 @@
     }
 
     drawPlayer(ctx, p) {
-      const shadowScale = 1 - clamp((GROUND_Y - (p.y + PLAYER_R)) / 200, 0, 0.5);
+      const R = p.r;
+      const shadowScale = 1 - clamp((GROUND_Y - (p.y + R)) / 200, 0, 0.5);
       ctx.fillStyle = 'rgba(0,0,0,0.25)';
       ctx.beginPath();
-      ctx.ellipse(p.x, GROUND_Y + 4, PLAYER_R * 0.8 * shadowScale, 7 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.ellipse(p.x, GROUND_Y + 4, R * 0.8 * shadowScale, 7 * shadowScale, 0, 0, Math.PI * 2);
       ctx.fill();
 
       // Squash & stretch around the feet: roughly volume-preserving so
       // jumps look springy and landings look weighty.
       const sYs = p.stretch;
       const sXs = 1 + (1 - sYs) * 0.6;
-      const ax = p.x, ay = p.y + PLAYER_R;
+      const ax = p.x, ay = p.y + R;
       ctx.save();
       ctx.translate(ax, ay);
       ctx.scale(sXs, sYs);
       ctx.translate(-ax, -ay);
 
-      const bodyY = p.y + PLAYER_R * 0.55;
+      const bodyY = p.y + R * 0.55;
       const bodyBottom = bodyY + 10;
       const kicking = p.kickTimer > 0;
       // 0→1→0 swing over the kick so the leg snaps out and returns.
@@ -897,7 +1167,7 @@
       const swing = p.onGround ? Math.sin(p.runPhase) * runAmp : 0;
       const legLen = p.onGround ? 14 : 10;
 
-      const skin = '#f2b98a';
+      const skin = p.skin;
       const hipBack = p.x - p.facing * 6;
       const hipFront = p.x + p.facing * 6;
       const backFootX = hipBack + p.facing * (-2 - swing);
@@ -929,7 +1199,7 @@
 
       // Back arm (behind the jersey)
       const armSwing = -swing * 0.9;
-      const shoulderY = p.y + PLAYER_R * 0.45;
+      const shoulderY = p.y + R * 0.45;
       ctx.strokeStyle = skin;
       ctx.lineWidth = 6;
       ctx.beginPath();
@@ -939,10 +1209,10 @@
 
       // Body (jersey) with a trim stripe
       ctx.fillStyle = p.color;
-      roundRectPath(ctx, p.x - PLAYER_R * 0.6, bodyY - 6, PLAYER_R * 1.2, PLAYER_R * 0.9, 10);
+      roundRectPath(ctx, p.x - R * 0.6, bodyY - 6, R * 1.2, R * 0.9, 10);
       ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      ctx.fillRect(p.x - PLAYER_R * 0.6 + 3, bodyY + 2, PLAYER_R * 1.2 - 6, 3);
+      ctx.fillRect(p.x - R * 0.6 + 3, bodyY + 2, R * 1.2 - 6, 3);
 
       // Front arm
       ctx.strokeStyle = skin;
@@ -951,9 +1221,10 @@
       ctx.lineTo(p.x + p.facing * (11 - armSwing), shoulderY + 13);
       ctx.stroke();
 
-      // Head — oversized, head-soccer style
-      const headR = PLAYER_R * 0.72;
+      // Head — oversized, head-soccer style — with the character's hair
+      const headR = R * 0.72;
       const headY = p.y - 2;
+      this.drawHairBack(ctx, p.x, headY, headR, p);
       ctx.fillStyle = skin;
       ctx.beginPath();
       ctx.arc(p.x, headY, headR, 0, Math.PI * 2);
@@ -961,13 +1232,7 @@
       ctx.strokeStyle = 'rgba(0,0,0,0.15)';
       ctx.lineWidth = 2;
       ctx.stroke();
-
-      // Headband in team trim color
-      ctx.strokeStyle = p.accent;
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(p.x, headY, headR - 1.5, Math.PI * 1.12, Math.PI * 1.88);
-      ctx.stroke();
+      this.drawHairFront(ctx, p.x, headY, headR, p, p.facing);
 
       // Face: eye, brow, and a little smile on the facing side
       ctx.fillStyle = '#1a1a1a';
@@ -995,7 +1260,9 @@
       for (let i = trail.length - 1; i >= 0; i--) {
         const t = trail[i];
         const f = 1 - i / 9;
-        ctx.fillStyle = `rgba(255,255,255,${0.22 * f})`;
+        ctx.fillStyle = this.fx.golden
+          ? `rgba(255,210,63,${0.4 * f})`
+          : `rgba(255,255,255,${0.22 * f})`;
         ctx.beginPath();
         ctx.arc(t.x, t.y, BALL_R * (0.4 + 0.6 * f), 0, Math.PI * 2);
         ctx.fill();

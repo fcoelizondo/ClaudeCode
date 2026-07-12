@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>1v1 Soccer</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1v1 Soccer">
+<meta name="theme-color" content="#1c8a4a">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="timer">1:30</div>
+    <div id="score"><span id="score-left">0</span><span class="dash">-</span><span id="score-right">0</span></div>
+  </div>
+
+  <div id="start-overlay" class="overlay">
+    <div class="panel">
+      <h1>1V1 SOCCER</h1>
+      <p>First to score more goals in 90 seconds wins.</p>
+      <p>Move, jump into the ball, and kick it past the keeper.</p>
+      <div class="mode-buttons">
+        <button id="mode-1p" class="btn">1 PLAYER<span>vs CPU</span></button>
+        <button id="mode-2p" class="btn btn-alt">2 PLAYERS<span>same keyboard</span></button>
+      </div>
+      <div class="controls-help">
+        <div><strong>P1</strong> A/D move · W jump · S kick</div>
+        <div><strong>P2</strong> ←/→ move · ↑ jump · ↓ kick</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="goal-banner" class="banner hidden">GOAL!</div>
+
+  <div id="fulltime-overlay" class="overlay hidden">
+    <div class="panel">
+      <h1 id="fulltime-title">FULL TIME</h1>
+      <p id="fulltime-score">0 - 0</p>
+      <button id="restart-btn" class="btn">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <div class="touch-controls">
+    <div id="p1-controls" class="pad pad-left">
+      <div class="pad-row">
+        <button class="pad-btn" data-action="p1-left">◀</button>
+        <button class="pad-btn" data-action="p1-jump">▲</button>
+        <button class="pad-btn" data-action="p1-right">▶</button>
+      </div>
+      <button class="pad-btn kick-btn" data-action="p1-kick">KICK</button>
+    </div>
+    <div id="p2-controls" class="pad pad-right hidden">
+      <div class="pad-row">
+        <button class="pad-btn" data-action="p2-left">◀</button>
+        <button class="pad-btn" data-action="p2-jump">▲</button>
+        <button class="pad-btn" data-action="p2-right">▶</button>
+      </div>
+      <button class="pad-btn kick-btn" data-action="p2-kick">KICK</button>
+    </div>
+  </div>
+
+  <div id="rotate-overlay">
+    <div class="rotate-icon">📱</div>
+    <p>Rotate your device to play — 1v1 Soccer is a landscape game.</p>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

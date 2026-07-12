@@ -4,7 +4,7 @@
   // ---- Field & physics constants (logical pixels, tuned for this layout) ----
   const WIDTH = 960, HEIGHT = 540;
   const GROUND_Y = HEIGHT - 70;
-  const GOAL_WIDTH = 46;
+  const GOAL_WIDTH = 88; // deep nets pull the goal lines toward midfield, Head Ball-style
   const GOAL_HEIGHT = 150;
   const GOAL_LINE_LEFT = GOAL_WIDTH;
   const GOAL_LINE_RIGHT = WIDTH - GOAL_WIDTH;
@@ -22,7 +22,9 @@
   const WALL_BOUNCE = 0.68;
   const KICK_RANGE = PLAYER_R + BALL_R + 18;
   const KICK_POWER = 920;
-  const KICK_LIFT = -360;
+  // Lift tuned so a midfield shot crosses the goal line roughly at
+  // jump-block height: the defender can save it by timing a jump.
+  const KICK_LIFT = -620;
   const KICK_DURATION = 0.18;
   const BALL_MAX_SPEED = 1350;
   const BUMP_POWER = 480;
@@ -299,9 +301,22 @@
       this.updatePlayerPhysics(this.p1, dt);
       this.updatePlayerPhysics(this.p2, dt);
       this.resolvePlayerCollision();
-      this.updateBallPhysics(dt);
-      this.resolveBallPlayerCollision(this.p1, dt);
-      this.resolveBallPlayerCollision(this.p2, dt);
+
+      // Substep the ball so a fast shot can't tunnel through a player
+      // between frames (~10px of travel per substep), and resolve the
+      // player pair twice per substep so being pushed out of one body
+      // in a scrum can't shove the ball straight through the other.
+      const speed = Math.hypot(this.ball.vx, this.ball.vy);
+      const steps = clamp(Math.ceil((speed * dt) / 10), 1, 6);
+      const h = dt / steps;
+      for (let i = 0; i < steps; i++) {
+        this.updateBallPhysics(h);
+        for (let k = 0; k < 2; k++) {
+          this.resolveBallPlayerCollision(this.p1, h);
+          this.resolveBallPlayerCollision(this.p2, h);
+        }
+      }
+      this.updateTrail();
     }
 
     updateTimerHud() {
@@ -378,7 +393,9 @@
 
     updatePlayerPhysics(p, dt) {
       p.x += p.vx * dt;
-      p.x = clamp(p.x, PLAYER_R, WIDTH - PLAYER_R);
+      // Players stop at the goal lines — they can guard the line like a
+      // keeper but not run inside the net.
+      p.x = clamp(p.x, GOAL_LINE_LEFT, GOAL_LINE_RIGHT);
 
       const wasAirborne = !p.onGround;
       p.vy += GRAVITY * dt;
@@ -409,8 +426,8 @@
       if (dist < minDist) {
         const push = (minDist - dist) / 2;
         const dir = dx > 0 ? 1 : -1;
-        a.x = clamp(a.x - push * dir, PLAYER_R, WIDTH - PLAYER_R);
-        b.x = clamp(b.x + push * dir, PLAYER_R, WIDTH - PLAYER_R);
+        a.x = clamp(a.x - push * dir, GOAL_LINE_LEFT, GOAL_LINE_RIGHT);
+        b.x = clamp(b.x + push * dir, GOAL_LINE_LEFT, GOAL_LINE_RIGHT);
       }
     }
 
@@ -472,8 +489,11 @@
       // bounces around inside the goal during the celebration.
       if (b.x - BALL_R < 0) { b.x = BALL_R; b.vx = -b.vx * WALL_BOUNCE; }
       if (b.x + BALL_R > WIDTH) { b.x = WIDTH - BALL_R; b.vx = -b.vx * WALL_BOUNCE; }
+    }
 
-      // Motion trail
+    // Sampled once per frame (not per substep) so trail spacing stays even.
+    updateTrail() {
+      const b = this.ball;
       const sp = Math.hypot(b.vx, b.vy);
       if (sp > 480) {
         this.fx.trail.unshift({ x: b.x, y: b.y });
@@ -528,9 +548,11 @@
           // Kicks are aimed: mostly toward the opponent's goal, with some
           // contact-angle influence, and extra lift on jump kicks.
           const dirSign = p === this.p1 ? 1 : -1;
-          const lift = p.onGround ? KICK_LIFT : KICK_LIFT * 1.3;
+          const lift = p.onGround ? KICK_LIFT : KICK_LIFT * 1.2;
           b.vx = dirSign * KICK_POWER * 0.72 + nx * KICK_POWER * 0.28 + p.vx * 0.35;
-          b.vy = lift + ny * KICK_POWER * 0.25;
+          // Small contact-angle influence only: a ball on the ground has a
+          // downward-pointing normal that would otherwise flatten the arc.
+          b.vy = lift + ny * KICK_POWER * 0.18;
           p.kickApplied = true;
           this.spawnSpark(b.x, b.y);
           this.addShake(4);

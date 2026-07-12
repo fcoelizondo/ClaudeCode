@@ -6,8 +6,12 @@ directly or serve the folder.
 
 ## Controls
 
-- Drag left/right anywhere on screen, or press **← / A**, **→ / D**, to
-  steer Roo in the air.
+- Tilt your phone left/right to steer Roo in the air (device orientation
+  sensor). On desktop, use **← / A**, **→ / D** instead. Neutral tilt is
+  calibrated to however you're holding the phone the moment each run
+  starts, so there's no need to hold it dead level.
+- iOS requires a one-time motion-sensor permission prompt, triggered by
+  the "tap to play" gesture on the ready screen.
 - Roo bounces automatically whenever she lands on a platform — there's no
   jump button. Just don't let her fall off the bottom of the screen.
 - Roo wraps around the sides: drift off one edge and she reappears on the

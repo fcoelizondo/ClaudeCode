@@ -26,8 +26,12 @@
     <div class="panel">
       <h1>1V1 SOCCER</h1>
       <p>Score more goals than the CPU in 90 seconds.</p>
-      <p>Move, jump into the ball, and kick it into the net.</p>
-      <button id="start-btn" class="btn">PLAY</button>
+      <p>Pick your difficulty:</p>
+      <div class="mode-buttons">
+        <button id="diff-easy" class="btn">EASY</button>
+        <button id="diff-medium" class="btn btn-medium">MEDIUM</button>
+        <button id="diff-hard" class="btn btn-hard">HARD</button>
+      </div>
       <div class="controls-help">
         <div><strong>Keyboard</strong> A/D or ←/→ move · W/↑ jump · S/↓/Space kick</div>
         <div><strong>Touch</strong> left thumb moves · right thumb jumps &amp; kicks</div>
@@ -41,7 +45,10 @@
     <div class="panel">
       <h1 id="fulltime-title">FULL TIME</h1>
       <p id="fulltime-score">0 - 0</p>
-      <button id="restart-btn" class="btn">PLAY AGAIN</button>
+      <div class="mode-buttons">
+        <button id="restart-btn" class="btn">PLAY AGAIN</button>
+        <button id="menu-btn" class="btn btn-ghost">CHANGE LEVEL</button>
+      </div>
     </div>
   </div>
 

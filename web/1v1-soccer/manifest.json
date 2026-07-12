@@ -1,0 +1,13 @@
+{
+  "name": "1v1 Soccer",
+  "short_name": "1v1 Soccer",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0e2916",
+  "theme_color": "#0e2916",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

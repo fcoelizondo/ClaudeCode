@@ -1,8 +1,10 @@
 # 1v1 Soccer
 
 A side-view, physics-based head soccer game — 1 player vs a CPU
-opponent. Plain HTML5 Canvas + JS, no build step, no dependencies — open
-`index.html` directly or serve the folder.
+opponent with three selectable difficulty levels (easy/medium/hard vary
+the CPU's speed, reaction cooldowns, and anticipation). Plain HTML5
+Canvas + JS, no build step, no dependencies — open `index.html` directly
+or serve the folder.
 
 Score more goals than the CPU before the 90-second clock runs out. Bump
 the ball with any part of your player for a soft touch, or press kick

@@ -5,7 +5,7 @@
   const WIDTH = 960, HEIGHT = 540;
   const GROUND_Y = HEIGHT - 70;
   const GOAL_WIDTH = 88; // deep nets pull the goal lines toward midfield, Head Ball-style
-  const GOAL_HEIGHT = 150;
+  const GOAL_HEIGHT = 98;
   const GOAL_LINE_LEFT = GOAL_WIDTH;
   const GOAL_LINE_RIGHT = WIDTH - GOAL_WIDTH;
   const MOUTH_TOP = GROUND_Y - GOAL_HEIGHT;
@@ -22,14 +22,26 @@
   const WALL_BOUNCE = 0.68;
   const KICK_RANGE = PLAYER_R + BALL_R + 18;
   const KICK_POWER = 920;
-  // Lift tuned so a midfield shot crosses the goal line roughly at
+  // Lift tuned so a midrange shot crosses the goal line roughly at
   // jump-block height: the defender can save it by timing a jump.
-  const KICK_LIFT = -620;
+  const KICK_LIFT = -560;
   const KICK_DURATION = 0.18;
   const BALL_MAX_SPEED = 1350;
   const BUMP_POWER = 480;
   const MATCH_TIME = 90;
   const GOAL_CELEBRATE_TIME = 1.6;
+
+  // CPU skill per difficulty: base speed (× MOVE_SPEED), kick/jump reaction
+  // cooldowns, how far ahead of the ball it aims, and how long it hesitates
+  // after each kickoff.
+  // reaction: how long the ball must be within reach before the CPU may
+  // kick it. Without this, even a slow CPU returns every arriving ball
+  // with a perfect instant volley, which flattens the difficulty curve.
+  const DIFFICULTIES = {
+    easy:   { speed: 0.72, kickCd: 0.95, jumpCd: 0.95, lead: 0.10, kickoffWait: 1.0,  power: 0.78, reaction: 0.35 },
+    medium: { speed: 0.90, kickCd: 0.60, jumpCd: 0.60, lead: 0.22, kickoffWait: 0.55, power: 0.90, reaction: 0.18 },
+    hard:   { speed: 1.02, kickCd: 0.40, jumpCd: 0.45, lead: 0.30, kickoffWait: 0.25, power: 1.0,  reaction: 0.06 },
+  };
 
   const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
   const damp = (value, factor, dt) => value * Math.pow(factor, dt * 60);
@@ -114,6 +126,7 @@
       this.aiKickCd = 0;
       this.aiJumpCd = 0;
       this.aiWait = 0;
+      this.aiBallNear = 0;
     }
     jump() {
       if (this.onGround) {
@@ -161,9 +174,20 @@
       this.resize();
       window.addEventListener('resize', () => this.resize());
 
+      this.difficulty = DIFFICULTIES.medium;
       this.setupInput();
-      document.getElementById('start-btn').addEventListener('click', () => this.startMatch());
+      for (const key of Object.keys(DIFFICULTIES)) {
+        document.getElementById(`diff-${key}`).addEventListener('click', () => {
+          this.difficulty = DIFFICULTIES[key];
+          this.startMatch();
+        });
+      }
       document.getElementById('restart-btn').addEventListener('click', () => this.startMatch());
+      document.getElementById('menu-btn').addEventListener('click', () => {
+        this.fulltimeOverlay.classList.add('hidden');
+        this.startOverlay.classList.remove('hidden');
+        this.state = 'start';
+      });
 
       this.lastTime = performance.now();
       requestAnimationFrame((t) => this.loop(t));
@@ -250,10 +274,10 @@
       this.p1.reset();
       this.p2.reset();
       // Kickoff fairness: the CPU has frame-perfect reactions, so give it
-      // a short hesitation before it may charge the dropped ball, or it
-      // wins every kickoff scramble.
-      this.p2.aiWait = 0.55;
-      this.p2.aiKickCd = 0.8;
+      // a difficulty-scaled hesitation before it may charge the dropped
+      // ball, or it wins every kickoff scramble.
+      this.p2.aiWait = this.difficulty.kickoffWait;
+      this.p2.aiKickCd = this.difficulty.kickoffWait + 0.3;
     }
 
     updateScoreHud() {
@@ -349,6 +373,7 @@
     updateAI(dt) {
       const ai = this.p2;
       const ball = this.ball;
+      const d = this.difficulty;
       ai.aiKickCd = Math.max(0, ai.aiKickCd - dt);
       ai.aiJumpCd = Math.max(0, ai.aiJumpCd - dt);
 
@@ -360,14 +385,19 @@
         return;
       }
 
-      // Rubber-band difficulty: the CPU speeds up when trailing and eases
-      // off when comfortably ahead, so matches stay close.
-      const diff = clamp(this.scoreLeft - this.scoreRight, -2, 2);
-      const speed = MOVE_SPEED * (0.9 + 0.045 * diff);
+      // Rubber-band around the difficulty's base speed: the CPU speeds up
+      // when trailing and eases off when comfortably ahead.
+      const scoreDiff = clamp(this.scoreLeft - this.scoreRight, -2, 2);
+      const speed = MOVE_SPEED * (d.speed + 0.045 * scoreDiff);
 
-      // Lead the ball slightly so the CPU meets it instead of chasing it.
-      const lead = ball.x + ball.vx * 0.22;
-      const attacking = lead > WIDTH * 0.42 || ball.vx > 80;
+      // Lead the ball so the CPU meets it instead of chasing it; better
+      // CPUs anticipate further ahead.
+      const lead = ball.x + ball.vx * d.lead;
+      // Attack when the ball is on our side, coming toward us, or lying
+      // dead anywhere — a stationary loose ball must always be chased or
+      // the match deadlocks with the CPU parked at midfield.
+      const ballSpeed = Math.hypot(ball.vx, ball.vy);
+      const attacking = lead > WIDTH * 0.42 || ball.vx > 80 || ballSpeed < 140;
       // When attacking, stand slightly goal-side of the ball so kicks
       // send it left; when defending, hold a lane between ball and goal.
       const target = attacking
@@ -380,14 +410,17 @@
       if (ai.aiJumpCd === 0 && ai.onGround &&
           ball.y < ai.y - 24 && ball.vy > -60 && Math.abs(ball.x - ai.x) < 72) {
         ai.jump();
-        ai.aiJumpCd = 0.6;
+        ai.aiJumpCd = d.jumpCd;
       }
-      // The CPU kicks on a slower cadence than a human can, so timed
-      // kicks and jump kicks win contested scrambles more often than not.
+      // The CPU kicks on a slower cadence than a human can, and only
+      // after its reaction time has elapsed with the ball in reach — no
+      // instant volleys on arriving balls.
       const distToBall = Math.hypot(ball.x - ai.x, ball.y - ai.y);
-      if (distToBall < KICK_RANGE - 4 && ai.aiKickCd === 0) {
+      if (distToBall < KICK_RANGE + 30) ai.aiBallNear += dt;
+      else ai.aiBallNear = 0;
+      if (distToBall < KICK_RANGE - 4 && ai.aiKickCd === 0 && ai.aiBallNear >= d.reaction) {
         ai.kick();
-        ai.aiKickCd = 0.6;
+        ai.aiKickCd = d.kickCd;
       }
     }
 
@@ -458,8 +491,10 @@
         b.vy = -b.vy * WALL_BOUNCE;
       }
 
-      // Air drag + visual spin
-      b.vx = damp(b.vx, 0.995, dt);
+      // Air drag + visual spin. Drag is strong enough that a full-field
+      // kick dies and bounces before the far goal — long punts are not
+      // free goals; you have to advance the ball and shoot from range.
+      b.vx = damp(b.vx, 0.986, dt);
       b.spin += b.vx * dt * 0.025;
 
       // Post/crossbar tips — shots can rattle off the bar.
@@ -546,13 +581,16 @@
       if (kicking) {
         if (!p.kickApplied) {
           // Kicks are aimed: mostly toward the opponent's goal, with some
-          // contact-angle influence, and extra lift on jump kicks.
+          // contact-angle influence, and extra lift on jump kicks. The CPU
+          // kicks at its difficulty's power; weaker CPUs can't shoot from
+          // as far out.
           const dirSign = p === this.p1 ? 1 : -1;
-          const lift = p.onGround ? KICK_LIFT : KICK_LIFT * 1.2;
-          b.vx = dirSign * KICK_POWER * 0.72 + nx * KICK_POWER * 0.28 + p.vx * 0.35;
+          const pow = KICK_POWER * (p === this.p2 ? this.difficulty.power : 1);
+          const lift = (p.onGround ? KICK_LIFT : KICK_LIFT * 1.2) * (p === this.p2 ? this.difficulty.power : 1);
+          b.vx = dirSign * pow * 0.72 + nx * pow * 0.28 + p.vx * 0.35;
           // Small contact-angle influence only: a ball on the ground has a
           // downward-pointing normal that would otherwise flatten the arc.
-          b.vy = lift + ny * KICK_POWER * 0.18;
+          b.vy = lift + ny * pow * 0.18;
           p.kickApplied = true;
           this.spawnSpark(b.x, b.y);
           this.addShake(4);
@@ -972,23 +1010,72 @@
       ctx.ellipse(b.x, GROUND_Y + 4, BALL_R * 0.9 * shadowScale, 5 * shadowScale, 0, 0, Math.PI * 2);
       ctx.fill();
 
+      // Classic truncated-icosahedron look: a black pentagon in the
+      // middle, five more sliding off the rim, and seams between them.
+      const pentagon = (cx, cy, r, rot) => {
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const a = rot + (Math.PI * 2 * i) / 5 - Math.PI / 2;
+          const px = cx + Math.cos(a) * r;
+          const py = cy + Math.sin(a) * r;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      };
+
       ctx.save();
       ctx.translate(b.x, b.y);
       ctx.rotate(b.spin);
-      ctx.fillStyle = '#f5f5f5';
+
+      ctx.fillStyle = '#fdfdfd';
       ctx.beginPath();
       ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
-      ctx.fillStyle = '#222';
+
+      // Everything patterned stays inside the ball
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, BALL_R - 0.6, 0, Math.PI * 2);
+      ctx.clip();
+
+      // Seams radiating from the center pentagon's corners to the rim
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 1;
       for (let i = 0; i < 5; i++) {
-        const a = (Math.PI * 2 * i) / 5;
+        const a = (Math.PI * 2 * i) / 5 - Math.PI / 2;
         ctx.beginPath();
-        ctx.arc(Math.cos(a) * BALL_R * 0.5, Math.sin(a) * BALL_R * 0.5, 2.6, 0, Math.PI * 2);
+        ctx.moveTo(Math.cos(a) * BALL_R * 0.42, Math.sin(a) * BALL_R * 0.42);
+        ctx.lineTo(Math.cos(a) * BALL_R, Math.sin(a) * BALL_R);
+        ctx.stroke();
+      }
+
+      // Center pentagon
+      ctx.fillStyle = '#1b1b1b';
+      pentagon(0, 0, BALL_R * 0.42, 0);
+      ctx.fill();
+
+      // Rim pentagons, half-visible at the ball's edge
+      for (let i = 0; i < 5; i++) {
+        const a = (Math.PI * 2 * i) / 5 - Math.PI / 2 + Math.PI / 5;
+        pentagon(Math.cos(a) * BALL_R * 1.08, Math.sin(a) * BALL_R * 1.08, BALL_R * 0.4, a + Math.PI);
         ctx.fill();
       }
+      ctx.restore();
+
+      // Rounded shading: top-left highlight, and the outline
+      const hl = ctx.createRadialGradient(-BALL_R * 0.35, -BALL_R * 0.35, 1, 0, 0, BALL_R * 1.3);
+      hl.addColorStop(0, 'rgba(255,255,255,0.5)');
+      hl.addColorStop(0.5, 'rgba(255,255,255,0)');
+      hl.addColorStop(1, 'rgba(0,0,0,0.22)');
+      ctx.fillStyle = hl;
+      ctx.beginPath();
+      ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
       ctx.restore();
     }
 

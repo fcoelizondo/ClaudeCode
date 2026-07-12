@@ -26,7 +26,9 @@
     <div class="panel">
       <h1>1V1 SOCCER</h1>
       <p>Score more goals than the CPU in 90 seconds.</p>
-      <p>Pick your difficulty:</p>
+      <div id="roster" class="roster"></div>
+      <div id="stats-line" class="stats-line"></div>
+      <p>Pick your difficulty to play:</p>
       <div class="mode-buttons">
         <button id="diff-easy" class="btn">EASY</button>
         <button id="diff-medium" class="btn btn-medium">MEDIUM</button>
@@ -45,6 +47,7 @@
     <div class="panel">
       <h1 id="fulltime-title">FULL TIME</h1>
       <p id="fulltime-score">0 - 0</p>
+      <p id="unlock-note" class="unlock-note hidden"></p>
       <div class="mode-buttons">
         <button id="restart-btn" class="btn">PLAY AGAIN</button>
         <button id="menu-btn" class="btn btn-ghost">CHANGE LEVEL</button>

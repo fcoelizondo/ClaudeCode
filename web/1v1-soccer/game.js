@@ -80,7 +80,6 @@
       this.fulltimeTitle = document.getElementById('fulltime-title');
       this.fulltimeScore = document.getElementById('fulltime-score');
       this.goalBanner = document.getElementById('goal-banner');
-      this.p2Controls = document.getElementById('p2-controls');
 
       this.p1 = new Player('left', '#5cc7ff', false);
       this.p2 = new Player('right', '#ff6b6b', true);
@@ -98,9 +97,8 @@
       window.addEventListener('resize', () => this.resize());
 
       this.setupInput();
-      document.getElementById('mode-1p').addEventListener('click', () => this.startMatch(false));
-      document.getElementById('mode-2p').addEventListener('click', () => this.startMatch(true));
-      document.getElementById('restart-btn').addEventListener('click', () => this.startMatch(this.twoPlayer));
+      document.getElementById('start-btn').addEventListener('click', () => this.startMatch());
+      document.getElementById('restart-btn').addEventListener('click', () => this.startMatch());
 
       this.lastTime = performance.now();
       requestAnimationFrame((t) => this.loop(t));
@@ -131,12 +129,8 @@
         if (e.repeat) return;
         this.keys[e.code] = true;
         if (this.state !== 'playing') return;
-        if (e.code === 'KeyW') this.p1.jump();
-        if (e.code === 'KeyS' || e.code === 'Space') this.p1.kick();
-        if (this.twoPlayer) {
-          if (e.code === 'ArrowUp') this.p2.jump();
-          if (e.code === 'ArrowDown') this.p2.kick();
-        }
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') this.p1.jump();
+        if (e.code === 'KeyS' || e.code === 'ArrowDown' || e.code === 'Space') this.p1.kick();
       });
       window.addEventListener('keyup', (e) => {
         this.keys[e.code] = false;
@@ -158,15 +152,9 @@
       bind('p1-left'); bind('p1-right');
       bind('p1-jump', () => this.state === 'playing' && this.p1.jump());
       bind('p1-kick', () => this.state === 'playing' && this.p1.kick());
-      bind('p2-left'); bind('p2-right');
-      bind('p2-jump', () => this.state === 'playing' && this.twoPlayer && this.p2.jump());
-      bind('p2-kick', () => this.state === 'playing' && this.twoPlayer && this.p2.kick());
     }
 
-    startMatch(twoPlayer) {
-      this.twoPlayer = twoPlayer;
-      this.p2.isAI = !twoPlayer;
-      this.p2Controls.classList.toggle('hidden', !twoPlayer);
+    startMatch() {
       this.scoreLeft = 0;
       this.scoreRight = 0;
       this.timeLeft = MATCH_TIME;
@@ -248,15 +236,8 @@
     updatePlayerInput(dt) {
       const p1 = this.p1;
       p1.vx = 0;
-      if (this.keys['KeyA'] || this.keys['p1-left']) { p1.vx -= MOVE_SPEED; p1.facing = -1; }
-      if (this.keys['KeyD'] || this.keys['p1-right']) { p1.vx += MOVE_SPEED; p1.facing = 1; }
-
-      if (this.twoPlayer) {
-        const p2 = this.p2;
-        p2.vx = 0;
-        if (this.keys['ArrowLeft'] || this.keys['p2-left']) { p2.vx -= MOVE_SPEED; p2.facing = -1; }
-        if (this.keys['ArrowRight'] || this.keys['p2-right']) { p2.vx += MOVE_SPEED; p2.facing = 1; }
-      }
+      if (this.keys['KeyA'] || this.keys['ArrowLeft'] || this.keys['p1-left']) { p1.vx -= MOVE_SPEED; p1.facing = -1; }
+      if (this.keys['KeyD'] || this.keys['ArrowRight'] || this.keys['p1-right']) { p1.vx += MOVE_SPEED; p1.facing = 1; }
     }
 
     updateAI(dt) {
@@ -363,21 +344,30 @@
       const dx = b.x - p.x;
       const dy = b.y - p.y;
       const dist = Math.hypot(dx, dy) || 0.001;
-      const minDist = PLAYER_R + BALL_R;
-      if (dist >= minDist) {
-        if (p.kickTimer <= 0) p.kickApplied = false;
+      const bodyDist = PLAYER_R + BALL_R;
+      const kicking = p.kickTimer > 0;
+      // A kick reaches further than a plain header/body bump, matching the
+      // outstretched leg drawn in drawPlayer() — otherwise the foot visibly
+      // touches the ball while the kick never registers.
+      const range = kicking ? KICK_RANGE : bodyDist;
+
+      if (dist >= range) {
+        if (!kicking) p.kickApplied = false;
         return;
       }
 
       const nx = dx / dist, ny = dy / dist;
-      b.x = p.x + nx * minDist;
-      b.y = p.y + ny * minDist;
+      if (dist < bodyDist) {
+        b.x = p.x + nx * bodyDist;
+        b.y = p.y + ny * bodyDist;
+      }
 
-      const kicking = p.kickTimer > 0 && !p.kickApplied;
       if (kicking) {
-        b.vx = nx * KICK_POWER + p.vx * 0.4;
-        b.vy = ny * KICK_POWER + KICK_LIFT;
-        p.kickApplied = true;
+        if (!p.kickApplied) {
+          b.vx = nx * KICK_POWER + p.vx * 0.4;
+          b.vy = ny * KICK_POWER + KICK_LIFT;
+          p.kickApplied = true;
+        }
       } else {
         const relSpeed = Math.hypot(p.vx, p.vy);
         const power = Math.max(BUMP_POWER * 0.4, relSpeed * 1.1);
@@ -404,8 +394,8 @@
     endMatch() {
       this.state = 'fulltime';
       let title = "IT'S A DRAW";
-      if (this.scoreLeft > this.scoreRight) title = this.twoPlayer ? 'PLAYER 1 WINS' : 'YOU WIN!';
-      else if (this.scoreRight > this.scoreLeft) title = this.twoPlayer ? 'PLAYER 2 WINS' : 'CPU WINS';
+      if (this.scoreLeft > this.scoreRight) title = 'YOU WIN!';
+      else if (this.scoreRight > this.scoreLeft) title = 'CPU WINS';
       this.fulltimeTitle.textContent = title;
       this.fulltimeScore.textContent = `${this.scoreLeft} - ${this.scoreRight}`;
       this.fulltimeOverlay.classList.remove('hidden');
@@ -528,16 +518,33 @@
       ctx.ellipse(p.x, GROUND_Y + 4, PLAYER_R * 0.8 * shadowScale, 7 * shadowScale, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Legs
-      const legExtend = p.kickTimer > 0 ? 22 : 6;
+      // Legs — always drawn a short, fixed length relative to the body
+      // (not to GROUND_Y), so they stay tucked-looking in the air instead
+      // of stretching into a long diagonal as the body rises on a jump.
+      const bodyBottom = bodyY + 10;
+      const kicking = p.kickTimer > 0;
+      const standLen = p.onGround ? 13 : 9;
+      const backX = p.x - p.facing * 6;
+      const frontX = p.x + p.facing * 6;
+
       ctx.strokeStyle = '#2b2b2b';
       ctx.lineWidth = 8;
       ctx.lineCap = 'round';
+
+      // Back (support) leg
       ctx.beginPath();
-      ctx.moveTo(p.x - 8, bodyY + 10);
-      ctx.lineTo(p.x - 8 - (p.onGround ? 2 : 6), GROUND_Y - (p.onGround ? 2 : 10));
-      ctx.moveTo(p.x + 8, bodyY + 10);
-      ctx.lineTo(p.x + 8 * (p.facing >= 0 ? 1 : -1) + p.facing * legExtend, p.onGround ? GROUND_Y - 4 : GROUND_Y - 14);
+      ctx.moveTo(backX, bodyBottom);
+      ctx.lineTo(backX - p.facing * 2, bodyBottom + standLen);
+      ctx.stroke();
+
+      // Front (kicking) leg — swings forward and up while kicking
+      ctx.beginPath();
+      ctx.moveTo(frontX, bodyBottom);
+      if (kicking) {
+        ctx.lineTo(frontX + p.facing * 24, bodyBottom + standLen * 0.4);
+      } else {
+        ctx.lineTo(frontX + p.facing * 3, bodyBottom + standLen);
+      }
       ctx.stroke();
 
       // Body (jersey)

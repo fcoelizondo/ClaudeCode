@@ -1,15 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="42" fill="#2f9450"/>
-  <rect x="0" y="150" width="192" height="42" fill="#267a41"/>
-  <rect x="88" y="150" width="16" height="42" fill="rgba(255,255,255,0.35)"/>
-  <ellipse cx="96" cy="150" rx="70" ry="10" fill="rgba(255,255,255,0.25)"/>
-  <ellipse cx="70" cy="150" rx="24" ry="10" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
-  <circle cx="96" cy="86" r="34" fill="#f2b98a"/>
-  <circle cx="106" cy="82" r="3.4" fill="#1a1a1a"/>
-  <circle cx="128" cy="120" r="18" fill="#f5f5f5" stroke="#222" stroke-width="2"/>
-  <circle cx="128" cy="120" r="3.6" fill="#222"/>
-  <circle cx="121" cy="112" r="3.2" fill="#222"/>
-  <circle cx="135" cy="112" r="3.2" fill="#222"/>
-  <circle cx="121" cy="128" r="3.2" fill="#222"/>
-  <circle cx="135" cy="128" r="3.2" fill="#222"/>
+  <defs>
+    <clipPath id="rr">
+      <rect width="192" height="192" rx="42"/>
+    </clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101f33"/>
+      <stop offset="1" stop-color="#27584d"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="rgba(255,240,200,0.55)"/>
+      <stop offset="1" stop-color="rgba(255,240,200,0)"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#rr)">
+    <!-- dusk sky -->
+    <rect width="192" height="192" fill="url(#sky)"/>
+    <!-- floodlight glows -->
+    <circle cx="18" cy="14" r="34" fill="url(#glow)"/>
+    <circle cx="174" cy="14" r="34" fill="url(#glow)"/>
+    <!-- pitch -->
+    <rect x="0" y="118" width="192" height="74" fill="#2f9450"/>
+    <rect x="48" y="118" width="48" height="74" fill="#2a8a49"/>
+    <rect x="144" y="118" width="48" height="74" fill="#2a8a49"/>
+    <!-- pitch line -->
+    <rect x="0" y="118" width="192" height="4" fill="rgba(255,255,255,0.5)"/>
+    <!-- goal, top right -->
+    <path d="M138 40 h50 M186 40 v78" stroke="#f2f2f2" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M148 50 v60 M162 48 v64 M176 46 v68 M144 60 h44 M144 76 h44 M144 92 h44 M144 108 h44" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+    <!-- kicking leg from bottom left -->
+    <path d="M18 178 Q40 150 62 141" stroke="#2b2b2b" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <rect x="52" y="128" width="30" height="16" rx="7" fill="#e0473f"/>
+    <!-- motion trail -->
+    <circle cx="84" cy="122" r="7" fill="rgba(255,255,255,0.25)"/>
+    <circle cx="97" cy="112" r="9" fill="rgba(255,255,255,0.4)"/>
+    <!-- ball -->
+    <circle cx="122" cy="96" r="26" fill="#f7f7f7" stroke="#222" stroke-width="3"/>
+    <circle cx="122" cy="96" r="6.5" fill="#222"/>
+    <circle cx="122" cy="78" r="5" fill="#222"/>
+    <circle cx="139" cy="90" r="5" fill="#222"/>
+    <circle cx="133" cy="110" r="5" fill="#222"/>
+    <circle cx="111" cy="110" r="5" fill="#222"/>
+    <circle cx="105" cy="90" r="5" fill="#222"/>
+  </g>
 </svg>

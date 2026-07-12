@@ -31,4 +31,7 @@ audio assets).
 - `style.css` — layout, overlay, and touch-pad styling.
 - `game.js` — all game logic: player and ball physics, collisions, goal
   detection, simple CPU opponent, rendering.
-- `icon.svg` — home-screen / hub icon.
+- `icon.svg` — hub icon and PWA icon.
+- `apple-touch-icon.png` / `manifest.json` — home-screen install
+  support (iOS needs a full-bleed square PNG; it applies its own
+  corner rounding).

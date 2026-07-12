@@ -6,7 +6,14 @@ opponent. Plain HTML5 Canvas + JS, no build step, no dependencies — open
 
 Score more goals than the CPU before the 90-second clock runs out. Bump
 the ball with any part of your player for a soft touch, or press kick
-for a hard, aimed shot.
+for a hard shot aimed at the opponent's goal — jump kicks get extra
+lift. Shots can rattle off the crossbar, and the CPU rubber-bands its
+speed to keep matches close.
+
+Includes a full stadium backdrop (crowd, floodlights, ad boards),
+animated players with run cycles and squash-and-stretch, goal confetti,
+screen shake, a ball motion trail, and synthesized sound effects (no
+audio assets).
 
 ## Controls
 

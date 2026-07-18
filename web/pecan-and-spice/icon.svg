@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="42" fill="#faf5ec"/>
+  <!-- pecan half -->
+  <ellipse cx="96" cy="88" rx="44" ry="54" fill="#b97a3d"/>
+  <ellipse cx="96" cy="88" rx="34" ry="44" fill="#8a5527"/>
+  <path d="M96 44 C 88 60, 88 116, 96 132 C 104 116, 104 60, 96 44 Z" fill="#b97a3d"/>
+  <path d="M74 62 C 84 78, 84 98, 74 114 M118 62 C 108 78, 108 98, 118 114"
+        stroke="#b97a3d" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <!-- wordmark hint -->
+  <text x="96" y="166" text-anchor="middle"
+        font-family="Georgia, serif" font-style="italic" font-weight="bold"
+        font-size="26" fill="#244d84">P&amp;S</text>
+</svg>
